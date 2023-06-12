@@ -60,7 +60,8 @@ OBJ = \
 	util.o \
 	voltigore.o \
 	weapons.o \
-	zombie.o
+	zombie.o \
+	snake.o
 
 monster_mm_i386.so: ${OBJ}
 	${CPP} -m32 -fPIC -shared -o $@ ${OBJ}

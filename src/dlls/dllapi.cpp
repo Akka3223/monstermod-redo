@@ -167,6 +167,7 @@ monster_type_t monster_types[]=
 	"monstermaker", FALSE, // Extra entities
 	"ambient_music", FALSE,
 	"squadmaker", FALSE, // Aliases
+	"monster_snake", FALSE,
 	"", FALSE
 };
 
@@ -711,6 +712,8 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		// Extra entities
 		case 32: monsters[monster_index].pMonster = CreateClassPtr((CMMonsterMaker *)NULL); break;
 		case 33: monsters[monster_index].pMonster = CreateClassPtr((CMAmbientMusic *)NULL); break;
+		case 35: monsters[monster_index].pMonster = CreateClassPtr((CMSnake *)NULL); break;
+
 	}
 
 	if (monsters[monster_index].pMonster == NULL)
@@ -728,6 +731,8 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	monster_pent->v.origin = origin;
 	monster_pent->v.angles = angles;
 	
+	monster_pent->v.vuser1 = origin;
+
 	// Pass spawnflags first if no keyvalue data exists for it
 	monster_pent->v.spawnflags = spawnflags;
 	
@@ -740,6 +745,9 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 			{
 				kvd.szKeyName = keyvalue[index].key;
 				kvd.szValue = keyvalue[index].value;
+				if (strcmp(kvd.szKeyName, "d2_category") == 0) {
+					monster_pent->v.iuser1 = (int)keyvalue[index].value;
+				}
 				monsters[monster_index].pMonster->KeyValue( &kvd );
 			}
 		}
@@ -1442,6 +1450,9 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	// Extra entities
 	CMMonsterMaker monstermaker; // 32
 	CMAmbientMusic ambientmusic;
+
+	CMSnake snake; // 34
+
 	
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 
@@ -1492,6 +1503,8 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 				case 29: stukabat.Precache(); break;
 				case 32: monstermaker.Precache(); break;
 				//case 33: ambientmusic.Precache(); break;
+				case 35: snake.Precache(); break;
+
 			}
 		}
 	}
