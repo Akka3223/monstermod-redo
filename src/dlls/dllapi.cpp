@@ -727,7 +727,6 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	monsters[monster_index].monster_pent = monster_pent;
 
 	monsters[monster_index].monster_index = (*g_engfuncs.pfnIndexOfEdict)(monster_pent);
-
 	monster_pent->v.origin = origin;
 	monster_pent->v.angles = angles;
 	
@@ -745,9 +744,6 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 			{
 				kvd.szKeyName = keyvalue[index].key;
 				kvd.szValue = keyvalue[index].value;
-				if (strcmp(kvd.szKeyName, "d2_category") == 0) {
-					monster_pent->v.iuser1 = (int)keyvalue[index].value;
-				}
 				monsters[monster_index].pMonster->KeyValue( &kvd );
 			}
 		}

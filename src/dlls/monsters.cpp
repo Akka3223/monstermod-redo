@@ -1649,6 +1649,8 @@ void CMBaseMonster :: MonsterInit ( void )
 	if ( pev->spawnflags & SF_MONSTER_HITMONSTERCLIP )
 		pev->flags |= FL_MONSTERCLIP;
 	
+	pev->iuser2 = m_d2category;
+
 	ClearSchedule();
 	RouteClear();
 	InitBoneControllers( ); // FIX: should be done in Spawn
@@ -2624,6 +2626,11 @@ void CMBaseMonster :: KeyValue( KeyValueData *pkvd )
 	else if (FStrEq(pkvd->szKeyName, "classify"))
 	{
 		m_iClassifyOverride = atoi( pkvd->szValue );
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "d2_category"))
+	{
+		m_d2category = atoi( pkvd->szValue );
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "bloodcolor"))

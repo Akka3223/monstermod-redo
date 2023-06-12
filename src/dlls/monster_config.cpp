@@ -765,7 +765,7 @@ void scan_monster_bsp(void)
 					else if (strcmp(data[i].key, "d2_category") == 0)
 					{
 						if (monster)
-						{ // iuser2
+						{
 							// file handling, string must not be empty
 							if (strlen(data[i].value))
 							{

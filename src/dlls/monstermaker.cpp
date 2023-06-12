@@ -248,6 +248,12 @@ void CMMonsterMaker::MakeMonster( void )
 		sprintf(keyvalue[6].value, "%i", m_iClassifyOverride);
 	}
 
+	// Classify override
+	if ( m_d2category )
+	{
+		strcpy(keyvalue[7].key, "d2_category");
+		sprintf(keyvalue[7].value, "%i", m_d2category);
+	}
 	// Attempt to spawn monster
 	pent = spawn_monster(m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
 	if ( pent == NULL )

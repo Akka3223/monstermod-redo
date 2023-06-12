@@ -104,6 +104,8 @@ public:
 	
 	string_t			m_szMonsterName; // Monster name to display on HUD
 	int					m_iClassifyOverride; // Overriden classification for this monster
+
+	int 				m_d2category;
 	
 	REPLACER::REPLACER	*m_srSoundList; // individual sound replacements for this monster
 	int					m_isrSounds; // number of replaced sounds
