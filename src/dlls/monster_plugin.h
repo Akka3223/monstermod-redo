@@ -41,6 +41,7 @@ typedef struct {
    int spawnflags;
    pKVD *keyvalue;
    bool need_to_respawn;
+   int d2_category;
 } monster_spawnpoint_t;
 
 #define MAX_MONSTERS 100

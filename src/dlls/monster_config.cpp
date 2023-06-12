@@ -762,6 +762,21 @@ void scan_monster_bsp(void)
 							}
 						}
 					}
+					else if (strcmp(data[i].key, "d2_category") == 0)
+					{
+						if (monster)
+						{ // iuser2
+							// file handling, string must not be empty
+							if (strlen(data[i].value))
+							{
+								monster_spawnpoint[monster_spawn_count].d2_category = (int)data[i].value;
+								
+								// the entity will need the keyvalue as well
+								strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
+								strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);
+							}
+						}
+					}
 					else if (strcmp(data[i].key, "monstertype") == 0)
 					{
 						if (monster)
