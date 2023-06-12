@@ -412,6 +412,41 @@ public:
 };
 
 
+class CMSnake : public CMBaseMonster
+{
+public:
+	void Spawn( void );
+	void Precache( void );
+	void SetYawSpeed( void );
+	int  Classify ( void );
+	void HandleAnimEvent( MonsterEvent_t *pEvent );
+	int IgnoreConditions ( void );
+	void DeathSound( void );
+
+	float m_flNextFlinch;
+
+	void PainSound( void );
+	void AlertSound( void );
+	void IdleSound( void );
+	void AttackSound( void );
+	void SetActivity ( Activity NewActivity );
+	
+	virtual int GetVoicePitch( void ) { return 100; }
+	virtual float GetSoundVolume( void ) { return 1.0; }
+	static const char *pAttackSounds[];
+	static const char *pIdleSounds[];
+	static const char *pAlertSounds[];
+	static const char *pPainSounds[];
+	static const char *pAttackHitSounds[];
+	static const char *pAttackMissSounds[];
+	static const char *pDeathSounds[];
+	// No range attacks
+	BOOL CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
+	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
+	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+};
+
+
 class CMSqueakGrenade : public CMGrenade
 {
 public:
