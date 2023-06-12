@@ -1907,10 +1907,11 @@ int UTIL_TakeDamage( edict_t *pEdict, entvars_t *pevInflictor, entvars_t *pevAtt
 	{
 		float force = flDamage * ((32 * 32 * 72.0) / (pEdict->v.size.x * pEdict->v.size.y * pEdict->v.size.z)) * 5;
 	
-		if ( force > 1000.0) 
-			force = 1000.0;
+		if ( force > 300.0) 
+			force = 300.0;
 
 		pEdict->v.velocity = pEdict->v.velocity + vecDir * -force;
+		pEdict->v.velocity.z = pEdict->v.velocity.z + vecDir.z * (-force / 3);
 	}
 
 	// do the damage
