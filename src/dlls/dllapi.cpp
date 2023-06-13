@@ -730,7 +730,6 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	monster_pent->v.origin = origin;
 	monster_pent->v.angles = angles;
 	
-	monster_pent->v.vuser1 = origin;
 
 	// Pass spawnflags first if no keyvalue data exists for it
 	monster_pent->v.spawnflags = spawnflags;
@@ -1263,10 +1262,10 @@ int mmDispatchSpawn( edict_t *pent )
 		{
 			if (monsters[index].pMonster != NULL)
 			{
-				// free the soundlists first!
-				if (monsters[index].pMonster->m_srSoundList != NULL)
-					free(monsters[index].pMonster->m_srSoundList);
-				monsters[index].pMonster->m_srSoundList = NULL;
+				// // free the soundlists first!
+				// if (monsters[index].pMonster->m_srSoundList != NULL)
+				// 	free(monsters[index].pMonster->m_srSoundList);
+				// monsters[index].pMonster->m_srSoundList = NULL;
 
 				delete monsters[index].pMonster;
 			}
