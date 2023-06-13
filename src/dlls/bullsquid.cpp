@@ -625,7 +625,7 @@ void CMBullsquid :: Spawn()
 
 	MonsterInit();
 	
-	pev->classname = MAKE_STRING( "monster_bullchicken" );
+	pev->classname = MAKE_STRING( "monster_bullsquid" );
 	if ( strlen( STRING( m_szMonsterName ) ) == 0 )
 	{
 		// default name
