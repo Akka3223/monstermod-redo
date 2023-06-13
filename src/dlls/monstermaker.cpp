@@ -255,6 +255,7 @@ void CMMonsterMaker::MakeMonster( void )
 		sprintf(keyvalue[7].value, "%i", m_d2category);
 	}
 	// Attempt to spawn monster
+
 	pent = spawn_monster(m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
 	if ( pent == NULL )
 	{
@@ -268,6 +269,10 @@ void CMMonsterMaker::MakeMonster( void )
 		// delay already overloaded for this entity, so can't call SUB_UseTargets()
 		FireTargets( STRING(pev->target), this->edict(), this->edict(), USE_TOGGLE, 0 );
 	}
+	
+	pent->v.vuser1.x = pev->origin.x;
+	pent->v.vuser1.y = pev->origin.y;
+	pent->v.vuser1.z = pev->origin.z;
 	
 	pent->v.owner = edict();
 
