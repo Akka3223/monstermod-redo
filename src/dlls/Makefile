@@ -1,5 +1,5 @@
 CPP = g++
-BASEFLAGS = -Dstricmp=strcasecmp -Dstrcmpi=strcasecmp -m32 -fPIC
+BASEFLAGS = -Dstricmp=strcasecmp -Dstrcmpi=strcasecmp -m32 -fPIC -Wall -Werror
 OPTFLAGS = -O2
 CPPFLAGS = ${BASEFLAGS} ${OPTFLAGS} -w -I. -I../engine -I../common -I../pm_shared -I../metamod
 
@@ -61,7 +61,8 @@ OBJ = \
 	voltigore.o \
 	weapons.o \
 	zombie.o \
-	snake.o
+	snake.o \
+	crab.o
 
 monster_mm_i386.so: ${OBJ}
 	${CPP} -m32 -fPIC -shared -o $@ ${OBJ}

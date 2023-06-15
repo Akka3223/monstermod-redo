@@ -168,6 +168,7 @@ monster_type_t monster_types[]=
 	"ambient_music", FALSE,
 	"squadmaker", FALSE, // Aliases
 	"monster_snake", FALSE,
+	"monster_crab", FALSE,
 	"", FALSE
 };
 
@@ -713,6 +714,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		case 32: monsters[monster_index].pMonster = CreateClassPtr((CMMonsterMaker *)NULL); break;
 		case 33: monsters[monster_index].pMonster = CreateClassPtr((CMAmbientMusic *)NULL); break;
 		case 35: monsters[monster_index].pMonster = CreateClassPtr((CMSnake *)NULL); break;
+		case 36: monsters[monster_index].pMonster = CreateClassPtr((CMCrab *)NULL); break;
 
 	}
 
@@ -1447,6 +1449,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	CMAmbientMusic ambientmusic;
 
 	CMSnake snake; // 34
+	CMCrab crab; // 34
 
 	
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
@@ -1499,6 +1502,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 				case 32: monstermaker.Precache(); break;
 				//case 33: ambientmusic.Precache(); break;
 				case 35: snake.Precache(); break;
+				case 36: crab.Precache(); break;
 
 			}
 		}

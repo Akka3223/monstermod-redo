@@ -1419,7 +1419,36 @@ public:
 	void EXPORT StartTrail();
 	static edict_t *Shoot(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, Vector vecAngles);
 };
+//=========================================================
+// Crab
+//=========================================================
+class CMCrab : public CMBaseMonster
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void SetYawSpeed(void);
+	int ISoundMask();
 
+	int Classify(void);
+
+	void IdleSound(void);
+	void PainSound(void);
+	void AlertSound(void);
+	void DeathSound(void);
+	int IgnoreConditions(void);
+	void SetActivity ( Activity NewActivity );
+
+	float	m_flLastHurtTime;
+	float	m_flNextFlinch;
+
+	static const char *pIdleSounds[];
+	static const char *pAlertSounds[];
+	static const char *pPainSounds[];
+	static const char *pDieSounds[];
+	static const char *pAttackMissSounds[];
+};
 //=========================================================
 // Pit Drone
 //=========================================================
