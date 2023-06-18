@@ -382,6 +382,38 @@ public:
 	virtual float GetSoundVolume( void ) { return 0.8; }
 };
 
+class CMGhoul : public CMBaseMonster
+{
+public:
+	void Spawn( void );
+	void Precache( void );
+	void SetYawSpeed( void );
+	int  Classify ( void );
+	void HandleAnimEvent( MonsterEvent_t *pEvent );
+	int IgnoreConditions ( void );
+	void SetActivity ( Activity NewActivity );
+
+	float m_flNextFlinch;
+
+	void PainSound( void );
+	void AlertSound( void );
+	void IdleSound( void );
+	void AttackSound( void );
+	void DeathSound( void );
+
+	static const char *pAttackSounds[];
+	static const char *pIdleSounds[];
+	static const char *pAlertSounds[];
+	static const char *pPainSounds[];
+	static const char *pAttackHitSounds[];
+	static const char *pAttackMissSounds[];
+	static const char *pDeathSounds[];
+
+	// No range attacks
+	BOOL CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
+	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
+	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+};
 
 class CMZombie : public CMBaseMonster
 {

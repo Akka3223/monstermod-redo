@@ -28,10 +28,9 @@
 #define	SF_MONSTERMAKER_START_ON	1 // start active ( if has targetname )
 #define	SF_MONSTERMAKER_CYCLIC		4 // drop one monster every time fired.
 #define SF_MONSTERMAKER_MONSTERCLIP	8 // Children are blocked by monsterclip
-
+extern int m_d2category_monster[];
 extern monster_type_t monster_types[];
 extern edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue);
-
 
 // ========================================================
 void CMMonsterMaker :: KeyValue( KeyValueData *pkvd )
@@ -102,7 +101,10 @@ void CMMonsterMaker :: KeyValue( KeyValueData *pkvd )
 void CMMonsterMaker :: Spawn( )
 {
 	// likely omitted keyvalue, but it could truly be an alien grunt spawn
-	if ( m_iMonsterIndex == 0 )
+	/* ALERT ( at_aiconsole, "[MONSTER] Spawned a monstermaker entity w [%d] Category\n", m_d2category);
+	//
+	ALERT ( at_aiconsole, "[MONSTER] Spawned a monstermaker m_iMonsterIndex [%d] [%s]\n", m_iMonsterIndex, STRING(pev->targetname));
+	 */if ( m_iMonsterIndex == 0 )
 	{
 		if ( !monster_types[0].need_to_precache )
 		{
@@ -255,14 +257,13 @@ void CMMonsterMaker::MakeMonster( void )
 		sprintf(keyvalue[7].value, "%i", m_d2category);
 	}
 	// Attempt to spawn monster
-
-	pent = spawn_monster(m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
+	m_iMonsterIndex = m_d2category_monster[m_d2category];
+	pent = spawn_monster( m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
 	if ( pent == NULL )
 	{
 		ALERT ( at_console, "[MONSTER] MonsterMaker - failed to spawn monster! targetname: \"%s\"\n", STRING(pev->targetname) );
 		return;
 	}
-	
 	// If I have a target, fire!
 	if ( !FStringNull ( pev->target ) )
 	{
@@ -275,7 +276,7 @@ void CMMonsterMaker::MakeMonster( void )
 	pent->v.vuser1.z = pev->origin.z;
 	
 	pent->v.owner = edict();
-
+	
 	if ( !FStringNull( pev->netname ) )
 	{
 		// if I have a netname (overloaded), give the child monster that name as a targetname

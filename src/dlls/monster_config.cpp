@@ -15,7 +15,7 @@
 #include "monster_plugin.h"
 #include "ripent.h"
 #include "globalreplace.h"
-
+#include <stdlib.h>
 extern cvar_t *dllapi_log;
 extern cvar_t *monster_entity_config;
 
@@ -25,6 +25,8 @@ extern cvar_t *globalsoundlist;
 extern monster_type_t monster_types[];
 extern int monster_spawn_count;
 extern int node_spawn_count;
+
+extern int m_d2category_monster[8];
 
 bool get_input(FILE *fp, char *input)
 {
@@ -377,6 +379,94 @@ void scan_monster_cfg(FILE *fp)
 										// precache the custom model
 										PRECACHE_MODEL( data[i].value );
 
+										// the entity will need the keyvalue as well
+										strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
+										strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);
+									}
+								}
+							}
+							else if (strcmp(data[i].key, "d2_category") == 0)
+							{
+								if (monster)
+								{
+									// file handling, string must not be empty
+									if (strlen(data[i].value))
+									{
+										int val = atoi(data[i].value);
+										LOG_CONSOLE(PLID, "[DEBUG] d2_category: %i %i", atoi(data[i].value), (int)data[i].value);
+										
+										monster_spawnpoint[monster_spawn_count].d2_category = val;
+									
+				 						if(m_d2category_monster[val] == -1) {
+											int rand = RANDOM_LONG(1,3);
+											if(val == 1) {
+												if(rand == 1) {
+													m_d2category_monster[1] = 36;
+												} else if(rand == 2) {
+													m_d2category_monster[1] = 7;
+												} else if(rand == 3) {
+													m_d2category_monster[1] = 0; // SCORPION MISSING
+												}
+											} else if(val == 2) {
+												if(rand == 1) {
+													m_d2category_monster[2] = 21;
+												} else if(rand == 2) {
+													m_d2category_monster[2] = 9;
+												} else if(rand == 3) {
+													m_d2category_monster[2] = 25;
+												}
+											} else if(val == 3) {
+												if(rand == 1) {
+													m_d2category_monster[3] = 37; // GHOUL MISSING
+												} else if(rand == 2) {
+													m_d2category_monster[3] = 4;
+												} else if(rand == 3) {
+													m_d2category_monster[3] = 29;
+												}
+												m_d2category_monster[3] = 37;
+											} else if(val == 4) {
+												if(rand == 1) {
+													m_d2category_monster[4] = 5;
+												} else if(rand == 2) {
+													m_d2category_monster[4] = 10;
+												} else if(rand == 3) {
+													m_d2category_monster[4] = 18;
+												}
+											} else if(val == 5) {
+												if(rand == 1) {
+													m_d2category_monster[5] = 0;
+												} else if(rand == 2) {
+													m_d2category_monster[5] = 0; // REVENANT MISSING
+												} else if(rand == 3) {
+													m_d2category_monster[5] = 0; // MISSING ADDITIONAL MOB
+												}
+											} else if(val == 6) {
+												if(rand == 1) {
+													m_d2category_monster[6] = 3;
+												} else if(rand == 2) {
+													m_d2category_monster[6] = 24;
+												} else if(rand == 3) {
+													m_d2category_monster[6] = 0; // MISSING ADDITIONAL MOB
+												}
+											} else if(val == 7) {
+												if(rand == 1) {
+													m_d2category_monster[7] = 13;
+												} else if(rand == 2) {
+													m_d2category_monster[7] = 13; // MISSING MUMMY;
+												} else if(rand == 3) {
+													m_d2category_monster[7] = 13; // MISSING ADDITIONAL MOB
+												}
+											}
+										}
+										int mIndex;
+										for (mIndex = 0; monster_types[mIndex].name[0]; mIndex++)
+										{
+											if (m_d2category_monster[val] == mIndex)
+											{
+												monster_types[mIndex].need_to_precache = TRUE;
+												break; // only one monster at a time
+											}
+										}
 										// the entity will need the keyvalue as well
 										strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
 										strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);
@@ -756,21 +846,6 @@ void scan_monster_bsp(void)
 								// precache the custom model
 								PRECACHE_MODEL( data[i].value );
 
-								// the entity will need the keyvalue as well
-								strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
-								strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);
-							}
-						}
-					}
-					else if (strcmp(data[i].key, "d2_category") == 0)
-					{
-						if (monster)
-						{
-							// file handling, string must not be empty
-							if (strlen(data[i].value))
-							{
-								monster_spawnpoint[monster_spawn_count].d2_category = (int)data[i].value;
-								
 								// the entity will need the keyvalue as well
 								strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
 								strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);

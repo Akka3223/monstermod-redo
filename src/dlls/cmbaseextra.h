@@ -17,6 +17,7 @@ public:
 	void EXPORT CyclicUse ( edict_t *pActivator, edict_t *pCaller, USE_TYPE useType, float value );
 	void EXPORT MakerThink ( void );
 	void DeathNotice ( entvars_t *pevChild );// monster maker children use this to tell the monster maker that they have died.
+	int GetMonsterTypeByCategory( int Category );
 	void MakeMonster( void );
 	
 	int m_iMonsterIndex;// index of the monster(s) that will be created.

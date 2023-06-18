@@ -121,7 +121,7 @@ DLL_DECALLIST gDecals[] = {
 	{ "{mommablob", -1 },	// DECAL_MOMMABIRTH		// BM Birth spray
 	{ "{mommablob", -1 },	// DECAL_MOMMASPLAT		// BM Mortar spray?? need decal
 };
-
+						
 monster_type_t monster_types[]=
 {
 	// These are just names. But to keep it consistent
@@ -169,6 +169,7 @@ monster_type_t monster_types[]=
 	"squadmaker", FALSE, // Aliases
 	"monster_snake", FALSE,
 	"monster_crab", FALSE,
+	"monster_ghoul", FALSE,
 	"", FALSE
 };
 
@@ -180,6 +181,8 @@ int monster_spawn_count = 0;
 
 node_spawnpoint_t node_spawnpoint[MAX_NODES];
 int node_spawn_count = 0;
+
+int m_d2category_monster[8];
 
 float check_respawn_time;
 float check_graph_time;
@@ -649,10 +652,10 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		char msg[256];
 
 		//META_CONS("[MONSTER] ERROR: You can't spawn monster %s since it wasn't precached!", monster_types[monster_type].name);
-		LOG_MESSAGE(PLID, "ERROR: You can't spawn monster %s since it wasn't precached!", monster_types[monster_type].name);
+		LOG_CONSOLE(PLID, "ERROR: You can't spawn monster %s [%i] since it wasn't precached!", monster_types[monster_type].name, monster_type);
 		
 		//META_CONS("[MONSTER] valid precached monster names are:");
-		LOG_MESSAGE(PLID, "valid precached monster names are:");
+		LOG_CONSOLE(PLID, "valid precached monster names are:");
 		msg[0] = 0;
 		for (int index = 0; monster_types[index].name[0]; index++)
 		{
@@ -663,7 +666,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 				if (strlen(msg) > 60)
 				{
 				   //META_CONS("[MONSTER] %s", msg);
-				   LOG_MESSAGE(PLID, "%s", msg);
+				   LOG_CONSOLE(PLID, "%s", msg);
 				   msg[0] = 0;
 				}
 			}
@@ -671,9 +674,10 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		if (msg[0])
 		{
 			//META_CONS("[MONSTER] %s", msg);
-			LOG_MESSAGE(PLID, "%s", msg);
+			LOG_CONSOLE(PLID, "%s", msg);
 		}
 		
+		LOG_CONSOLE(PLID, "ERROR: Here 2!");
 		return NULL;
 	}
 	
@@ -715,13 +719,14 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		case 33: monsters[monster_index].pMonster = CreateClassPtr((CMAmbientMusic *)NULL); break;
 		case 35: monsters[monster_index].pMonster = CreateClassPtr((CMSnake *)NULL); break;
 		case 36: monsters[monster_index].pMonster = CreateClassPtr((CMCrab *)NULL); break;
+		case 37: monsters[monster_index].pMonster = CreateClassPtr((CMGhoul *)NULL); break;
 
 	}
 
 	if (monsters[monster_index].pMonster == NULL)
 	{
 		//META_CONS("[MONSTER] ERROR: Error Creating Monster!" );
-		LOG_MESSAGE(PLID, "ERROR: Error Creating Monster!");
+		LOG_CONSOLE(PLID, "ERROR: Error Creating Monster!");
 		return NULL;
 	}
 
@@ -731,7 +736,6 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	monsters[monster_index].monster_index = (*g_engfuncs.pfnIndexOfEdict)(monster_pent);
 	monster_pent->v.origin = origin;
 	monster_pent->v.angles = angles;
-	
 
 	// Pass spawnflags first if no keyvalue data exists for it
 	monster_pent->v.spawnflags = spawnflags;
@@ -749,7 +753,10 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 			}
 		}
 	}
-	
+	char extCmd[64];
+	sprintf( extCmd, "_monsterspawned %i %s\n", ENTINDEX( monster_pent ), STRING(monster_pent->v.classname));
+
+	SERVER_COMMAND( extCmd );
 	monsters[monster_index].pMonster->Spawn();
 	
 	// Only modify starting spawnflags for monsters, not for entities!
@@ -1292,7 +1299,14 @@ int mmDispatchSpawn( edict_t *pent )
 
 		monster_spawn_count = 0;
 		node_spawn_count = 0;
-		
+		m_d2category_monster[0] = -1;
+		m_d2category_monster[1] = -1;
+		m_d2category_monster[2] = -1;
+		m_d2category_monster[3] = -1;
+		m_d2category_monster[4] = -1;
+		m_d2category_monster[5] = -1;
+		m_d2category_monster[6] = -1;
+		m_d2category_monster[7] = -1;
 		monster_skill_init();
 
 		process_monster_precache_cfg();
@@ -1448,8 +1462,9 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	CMMonsterMaker monstermaker; // 32
 	CMAmbientMusic ambientmusic;
 
-	CMSnake snake; // 34
-	CMCrab crab; // 34
+	CMSnake snake; // 35
+	CMCrab crab; // 36
+	CMGhoul ghoul; // 37
 
 	
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
@@ -1503,7 +1518,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 				//case 33: ambientmusic.Precache(); break;
 				case 35: snake.Precache(); break;
 				case 36: crab.Precache(); break;
-
+				case 37: ghoul.Precache(); break;
 			}
 		}
 	}
