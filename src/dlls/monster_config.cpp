@@ -393,7 +393,7 @@ void scan_monster_cfg(FILE *fp)
 									if (strlen(data[i].value))
 									{
 										int val = atoi(data[i].value);
-										LOG_CONSOLE(PLID, "[DEBUG] d2_category: %i %i", atoi(data[i].value), (int)data[i].value);
+									//	LOG_CONSOLE(PLID, "[DEBUG] d2_category: %i %i", atoi(data[i].value), (int)data[i].value);
 										
 										monster_spawnpoint[monster_spawn_count].d2_category = val;
 									
@@ -423,7 +423,6 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[3] = 29;
 												}
-												m_d2category_monster[3] = 37;
 											} else if(val == 4) {
 												if(rand == 1) {
 													m_d2category_monster[4] = 5;
