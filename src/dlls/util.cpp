@@ -1915,7 +1915,7 @@ int UTIL_TakeDamage( edict_t *pEdict, entvars_t *pevInflictor, entvars_t *pevAtt
 	}
 
 	// do the damage
-	pEdict->v.health -= flTake;
+	//pEdict->v.health -= flTake;
 	char extCmd[64];
 	sprintf( extCmd, "_ptakedamage %i %i %f\n", ENTINDEX( ENT( pevAttacker ) ), ENTINDEX( pEdict ), flDamage );
 	SERVER_COMMAND( extCmd );
