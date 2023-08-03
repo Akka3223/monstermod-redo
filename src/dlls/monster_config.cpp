@@ -406,6 +406,7 @@ void scan_monster_cfg(FILE *fp)
 													m_d2category_monster[1] = 7;
 												} else if(rand == 3) {
 													m_d2category_monster[1] = 0; // SCORPION MISSING
+													m_d2category_monster[1] = 7;
 												}
 											} else if(val == 2) {
 												if(rand == 1) {
@@ -417,7 +418,7 @@ void scan_monster_cfg(FILE *fp)
 												}
 											} else if(val == 3) {
 												if(rand == 1) {
-													m_d2category_monster[3] = 37; // GHOUL MISSING
+													m_d2category_monster[3] = 37;
 												} else if(rand == 2) {
 													m_d2category_monster[3] = 4;
 												} else if(rand == 3) {
@@ -446,6 +447,7 @@ void scan_monster_cfg(FILE *fp)
 													m_d2category_monster[6] = 24;
 												} else if(rand == 3) {
 													m_d2category_monster[6] = 0; // MISSING ADDITIONAL MOB
+													m_d2category_monster[6] = 24;
 												}
 											} else if(val == 7) {
 												if(rand == 1) {
