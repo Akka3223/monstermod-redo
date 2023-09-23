@@ -842,7 +842,61 @@ void world_precache(void)
 
 	PRECACHE_MODEL("models/w_grenade.mdl");
 }
+void MonsterDeadCommand(void)
+{
+	if (CMD_ARGC() >= 2)
+	{
+		edict_t *entity = INDEXENT( atoi( CMD_ARGV( 1 ) ) );
+		short entityIndex = ENTINDEX(entity);
+		for (int index = 0; index < monster_ents_used; index++)
+		{
+			if (monsters[index].monster_index)
+			{
+				edict_t *pent = (*g_engfuncs.pfnPEntityOfEntIndex)(monsters[index].monster_index);
+				if (pent)
+				{
+					short entityIndexx = ENTINDEX(pent);
+					if(entityIndexx == entityIndex)
+					{
+						if (monsters[index].killed == FALSE)
+						{
+							CMBaseEntity *pOwner = CMBaseEntity::Instance(pent->v.owner);
+							if ( pOwner )
+							{
+								pOwner->DeathNotice( VARS(pent) );  
+							}
+						}
+						if (pent->v.flags & FL_KILLME)	// func_wall was "killed"
+						{
+							if (pent->v.flags & FL_MONSTER)	// is this a monster?
+							{
+								if (monsters[index].killed == FALSE)
+								{
+									pent->v.flags &= ~FL_KILLME;  // clear FL_KILLME bit
 
+									pent->v.deadflag = DEAD_NO;   // bring back to life
+									
+									monsters[index].pMonster->Killed(VARS(pent), 0);
+									
+									monsters[index].killed = TRUE;
+								}
+							}
+							else	 // normal entity
+							{
+								FreeMonsterIndex(index);
+							}
+						}
+					}
+				}
+				else
+				{
+					FreeMonsterIndex(index);
+				}
+			}
+		}
+
+	}
+}
 void MonsterCommand(void)
 {
 	int index;
@@ -1472,6 +1526,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	(g_engfuncs.pfnAddServerCommand)("monster", MonsterCommand);
 	(g_engfuncs.pfnAddServerCommand)("node_viewer", SpawnViewerCommand);
 	(g_engfuncs.pfnAddServerCommand)("_use", mmDispatchUse);
+	(g_engfuncs.pfnAddServerCommand)("monster_killed", MonsterDeadCommand);
 
 	for (index = 0; monster_types[index].name[0]; index++)
 	{
