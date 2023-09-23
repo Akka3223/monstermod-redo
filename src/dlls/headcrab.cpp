@@ -254,7 +254,7 @@ void CMHeadCrab :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= gSkillData.headcrabHealth;
+	pev->health			= 110;
 	pev->view_ofs		= Vector ( 0, 0, 20 );// position of the eyes relative to monster's origin.
 	pev->yaw_speed		= 5;//!!! should we put this in the monster's changeanim function since turn rates may vary with state/anim?
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
@@ -328,11 +328,11 @@ void CMHeadCrab :: LeapTouch ( edict_t *pOther )
 		EMIT_SOUND_DYN( edict(), CHAN_WEAPON, RANDOM_SOUND_ARRAY(pBiteSounds), GetSoundVolume(), ATTN_IDLE, 0, GetVoicePitch() );
 
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, pev, GetDamageAmount(), DMG_SLASH );
+			UTIL_TakeDamage( pOther, pev, pev, RANDOM_FLOAT(7, 14), DMG_SLASH );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage( pev, pev, GetDamageAmount(), DMG_SLASH );
+			pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(7, 14), DMG_SLASH );
 		}
 	}
 
