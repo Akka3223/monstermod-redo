@@ -166,6 +166,7 @@ void CMMonsterMaker :: Precache( void )
 void CMMonsterMaker::MakeMonster( void )
 {
 	// monstermaker incorrectly setup or intentionally empty
+	char szMessage[129]; // To allow exactly 128 characters
 	if ( m_iMonsterIndex == -1 )
 	{
 		ALERT ( at_console, "[MONSTER] NULL Ent in MonsterMaker!\n" );
@@ -259,6 +260,8 @@ void CMMonsterMaker::MakeMonster( void )
 	// Attempt to spawn monster
 	m_iMonsterIndex = m_d2category_monster[m_d2category];
 	pent = spawn_monster( m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
+	
+
 	if ( pent == NULL )
 	{
 		ALERT ( at_console, "[MONSTER] MonsterMaker - failed to spawn monster! targetname: \"%s\"\n", STRING(pev->targetname) );
