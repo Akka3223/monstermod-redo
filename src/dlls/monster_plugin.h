@@ -21,6 +21,7 @@ typedef struct
 
 
 class CMBaseMonster;
+class CMMonsterMaker;
 
 typedef struct
 {
@@ -29,6 +30,7 @@ typedef struct
    bool killed;
    int respawn_index;
    CMBaseMonster *pMonster;
+   CMMonsterMaker *monster_maker_ent;
 } monster_t;
 
 #define MAX_MONSTER_ENTS 4000 // increased from 200 so it can hold non-monster entities
