@@ -30,7 +30,7 @@
 #define SF_MONSTERMAKER_MONSTERCLIP	8 // Children are blocked by monsterclip
 extern int m_d2category_monster[];
 extern monster_type_t monster_types[];
-extern edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue);
+extern edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue, CMMonsterMaker *isMaker);
 
 // ========================================================
 void CMMonsterMaker :: KeyValue( KeyValueData *pkvd )
@@ -179,6 +179,8 @@ void CMMonsterMaker::MakeMonster( void )
 
 	if ( m_iMaxLiveChildren > 0 && m_cLiveChildren >= m_iMaxLiveChildren )
 	{// not allowed to make a new one yet. Too many live ones out right now.
+		sprintf( szMessage, "[MONSTER] MonsterMaker - not allowed to make a new one yet. Too many live ones out right now. %d > %d\n", m_cLiveChildren, m_iMaxLiveChildren );
+		//UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 		return;
 	}
 
@@ -259,11 +261,13 @@ void CMMonsterMaker::MakeMonster( void )
 	}
 	// Attempt to spawn monster
 	m_iMonsterIndex = m_d2category_monster[m_d2category];
-	pent = spawn_monster( m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
+	pent = spawn_monster( m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue, this);
 	
 
 	if ( pent == NULL )
 	{
+		sprintf( szMessage, "[MONSTER] MonsterMaker - failed to spawn monster! targetname: \"%s\"\n", STRING(pev->targetname) );
+		UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 		ALERT ( at_console, "[MONSTER] MonsterMaker - failed to spawn monster! targetname: \"%s\"\n", STRING(pev->targetname) );
 		return;
 	}
@@ -302,7 +306,8 @@ void CMMonsterMaker::MakeMonster( void )
 		memcpy(pChild->m_srSoundList, m_srSoundList, sizeof(REPLACER::REPLACER));
 		pChild->m_isrSounds = m_isrSounds;
 	}
-
+	sprintf( szMessage, "[MONSTER] MonsterMaker - m_cLiveChildren + 1 = %d > %d\n", m_cLiveChildren, m_iMaxLiveChildren );
+	//UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 	m_cLiveChildren++;// count this monster
 	m_cNumMonsters--;
 
@@ -362,6 +367,8 @@ void CMMonsterMaker :: DeathNotice ( entvars_t *pevChild )
 {
 	// ok, we've gotten the deathnotice from our child, now clear out its owner if we don't want it to fade.
 	m_cLiveChildren--;
+	if(m_cLiveChildren < 0)
+		m_cLiveChildren = 0;
 
 	if ( !m_fFadeChildren )
 	{
