@@ -524,6 +524,7 @@ void CMBaseMonster::BecomeDead( void )
 	
 	// give the corpse half of the monster's original maximum health. 
 	pev->health = pev->max_health / 2;
+	pev->fuser4 = pev->health;
 	pev->max_health = 5; // max_health now becomes a counter for how many blood decals the corpse can place.
 
 	// make the corpse fly away from the attack vector
@@ -633,7 +634,6 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 		SetTouch( NULL );
 		BecomeDead();
 	}
-	
 	// don't let the status bar glitch for players.with <0 health.
 	if (pev->health < -99)
 	{
@@ -1328,7 +1328,7 @@ void CMBaseMonster :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vecto
 		case HITGROUP_GENERIC:
 			break;
 		case HITGROUP_HEAD:
-			flDamage *= 3; //gSkillData.monHead;
+			flDamage *= 1; //gSkillData.monHead;
 			break;
 		case HITGROUP_CHEST:
 			flDamage *= 1; //gSkillData.monChest;
