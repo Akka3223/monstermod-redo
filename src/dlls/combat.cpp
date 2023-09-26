@@ -309,6 +309,7 @@ void CMBaseMonster :: GibMonster( void )
 	BOOL		gibbed = FALSE;
 
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);		
+	char szMessage[129]; // To allow exactly 128 characters
 
 	// only humans throw skulls !!!UNDONE - eventually monsters will have their own sets of gibs
 	if ( HasHumanGibs() )
@@ -583,8 +584,8 @@ void CMBaseMonster::CallGibMonster( void )
 		pev->fuser4 = pev->health;
 	}
 	
-	if ( ShouldFadeOnDeath() && !fade )
-		UTIL_Remove(this->edict());
+	//if ( ShouldFadeOnDeath() && !fade )
+		//UTIL_Remove(this->edict());
 }
 
 
@@ -602,6 +603,13 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	if ( UTIL_IsPlayer( ENT( pevAttacker ) ) )
 		pevAttacker->frags += 1.0;
 	
+	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
+	CMBaseEntity *pOwner = CMBaseEntity::Instance(pev->owner);
+	if ( pOwner )
+	{
+		pOwner->DeathNotice( pev );  
+	}
+
 	if ( HasMemory( bits_MEMORY_KILLED ) )
 	{
 		if ( ShouldGibMonster( iGib ) )
@@ -617,12 +625,7 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	// Make sure this condition is fired too (TakeDamage breaks out before this happens on death)
 	SetConditions( bits_COND_LIGHT_DAMAGE );
 	
-	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
-	CMBaseEntity *pOwner = CMBaseEntity::Instance(pev->owner);
-	if ( pOwner )
-	{
-		pOwner->DeathNotice( pev );  
-	}
+
 
 	if	( ShouldGibMonster( iGib ) )
 	{
