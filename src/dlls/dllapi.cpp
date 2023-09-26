@@ -246,7 +246,6 @@ void Remove_Entity(edict_t *pEdict)
 			break;
 		}
 	}
-	
 	REMOVE_ENTITY(pEdict);
 }
 
@@ -362,7 +361,7 @@ void check_monster_dead(edict_t *pAttacker)
 
 							pent->v.deadflag = DEAD_NO;   // bring back to life
 							
-							monsters[index].pMonster->Killed(VARS(pAttacker), 0);
+							monsters[index].pMonster->Killed(VARS(pent), 0);
 							
 							monsters[index].killed = TRUE;
 						}
@@ -855,16 +854,25 @@ void world_precache(void)
 }
 void MonsterDeadCommand(void)
 {
-	if (CMD_ARGC() >= 2)
+	if (CMD_ARGC() >= 5)
 	{
 		char szMessage[129]; // To allow exactly 128 characters
 	//	edict_t *entity = INDEXENT( atoi( CMD_ARGV( 1 ) ) );
 		edict_t *pent = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 1 ) ));
+		edict_t *attacker = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 2 ) ));
+		edict_t *monstermaker = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 4 ) ));
 		if (pent)
 		{
-		//	UTIL_ClientPrintAll( HUD_PRINTTALK, "Killed?" );
+			CMBaseEntity *pOwner = CMBaseEntity::Instance(monstermaker);
+			if ( pOwner )
+			{
+				sprintf( szMessage, "[MONSTER] MonsterMaker - Send Deathnotice to monstermaker\n");
+				UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
+				pOwner->DeathNotice( VARS(pent) );  
+			}
+			UTIL_ClientPrintAll( HUD_PRINTTALK, "Killed?" );
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pent));
-			pMonster->Killed(VARS(pent), 0);
+			pMonster->Killed(VARS(attacker), atoi( CMD_ARGV( 3 ) ));
 		}
 	/* 	if(entity)
 		{
