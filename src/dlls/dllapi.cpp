@@ -867,10 +867,10 @@ void MonsterDeadCommand(void)
 			if ( pOwner )
 			{
 				sprintf( szMessage, "[MONSTER] MonsterMaker - Send Deathnotice to monstermaker\n");
-				UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
+			//	UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 				pOwner->DeathNotice( VARS(pent) );  
 			}
-			UTIL_ClientPrintAll( HUD_PRINTTALK, "Killed?" );
+			//UTIL_ClientPrintAll( HUD_PRINTTALK, "Killed?" );
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pent));
 			pMonster->Killed(VARS(attacker), atoi( CMD_ARGV( 3 ) ));
 		}
@@ -896,7 +896,7 @@ void MonsterDamagedCommand(void)
 		edict_t *pAttacker = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 2 ) ));
 		if (pent)
 		{
-			UTIL_ClientPrintAll( HUD_PRINTTALK, "Damaged?" );
+			//UTIL_ClientPrintAll( HUD_PRINTTALK, "Damaged?" );
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pent));
 
 			TraceResult tr;
