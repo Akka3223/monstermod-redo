@@ -121,14 +121,14 @@ void CMVoltigoreEnergyBall::BallTouch(edict_t *pOther)
 	else
 	{
 		if ( UTIL_IsPlayer( pOther ) )
-			UTIL_TakeDamage( pOther, pev, VARS( pev->owner ), gSkillData.voltigoreDmgBeam, DMG_SHOCK|DMG_ALWAYSGIB );
+			UTIL_TakeDamage( pOther, pev, VARS( pev->owner ), RANDOM_FLOAT(140, 220), DMG_SHOCK|DMG_ALWAYSGIB );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage( pev, VARS( pev->owner ), gSkillData.voltigoreDmgBeam, DMG_SHOCK|DMG_ALWAYSGIB );
+			pMonster->TakeDamage( pev, VARS( pev->owner ), RANDOM_FLOAT(140, 220), DMG_SHOCK|DMG_ALWAYSGIB );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), gSkillData.voltigoreDmgBeam, DMG_SHOCK | DMG_ALWAYSGIB );
+			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(140, 220), DMG_SHOCK | DMG_ALWAYSGIB );
 	}
 	pev->velocity = Vector(0,0,0);
 
@@ -150,14 +150,14 @@ void CMVoltigoreEnergyBall::FlyThink(void)
 			if (pEntity->v.takedamage && !FClassnameIs(pEntity, "monster_alien_voltigore") && !FClassnameIs(pEntity, "monster_alien_babyvoltigore"))
 			{
 				if ( UTIL_IsPlayer( pEntity ) )
-					UTIL_TakeDamage( pEntity, pev, pev, gSkillData.voltigoreDmgBeam/5, DMG_SHOCK );
+					UTIL_TakeDamage( pEntity, pev, pev, RANDOM_FLOAT(140, 220)/5, DMG_SHOCK );
 				else if (pEntity->v.euser4 != NULL)
 				{
 					CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
-					pMonster->TakeDamage( pev, pev, gSkillData.voltigoreDmgBeam/5, DMG_SHOCK );
+					pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(140, 220)/5, DMG_SHOCK );
 				}
 				else
-					UTIL_TakeDamageExternal( pEntity, pev, pev, gSkillData.voltigoreDmgBeam / 5, DMG_SHOCK );
+					UTIL_TakeDamageExternal( pEntity, pev, pev, RANDOM_FLOAT(140, 220)/ 5, DMG_SHOCK );
 			}
 		}
 		
@@ -399,7 +399,7 @@ BOOL CMVoltigore::CheckRangeAttack1(float flDot, float flDist)
 	{
 		if (m_hEnemy != 0)
 		{
-			if (fabs(pev->origin.z - m_hEnemy->v.origin.z) > 256)
+			if (fabs(pev->origin.z - m_hEnemy->v.origin.z) > 512)
 			{
 				// don't try to spit at someone up really high or down really low.
 				return FALSE;
@@ -447,6 +447,13 @@ void CMVoltigore::GibMonster()
 	}
 	SetThink( &CMBaseEntity::SUB_Remove );
 	pev->nextthink = gpGlobals->time;
+}
+
+void CMVoltigore::UpdateOnRemove()
+{
+	CMBaseMonster::UpdateOnRemove();
+	DestroyBeams();
+	DestroyGlow();
 }
 
 //=========================================================
@@ -561,7 +568,7 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case VOLTIGORE_AE_PUNCH_SINGLE:
 	{
 		// SOUND HERE!
-		edict_t *pHurt = CheckTraceHullAttack(120, gSkillData.voltigoreDmgPunch, DMG_CLUB);
+		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_FLOAT(105, 165), DMG_CLUB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -588,7 +595,7 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case VOLTIGORE_AE_PUNCH_BOTH:
 	{
 		// SOUND HERE!
-		edict_t *pHurt = CheckTraceHullAttack(120, gSkillData.voltigoreDmgPunch, DMG_CLUB);
+		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_FLOAT(105, 165), DMG_CLUB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -637,7 +644,7 @@ void CMVoltigore::Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= gSkillData.voltigoreHealth;
+	pev->health			= 3000.0;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -986,8 +993,8 @@ void CMVoltigore::GibBeamDamage()
 {
 	edict_t *pEntity = NULL;
 	// iterate on all entities in the vicinity.
-	const float attackRadius = gSkillData.voltigoreDmgBeam * 10;
-	float flAdjustedDamage = gSkillData.voltigoreDmgBeam/2;
+	const float attackRadius = RANDOM_FLOAT(70, 110) * 10;
+	float flAdjustedDamage = RANDOM_FLOAT(70, 110)/2;
 	while( ( pEntity = UTIL_FindEntityInSphere( pEntity, pev->origin, attackRadius ) ) != NULL )
 	{
 		if( pEntity->v.takedamage != DAMAGE_NO )
@@ -1145,7 +1152,7 @@ void CMBabyVoltigore::Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= gSkillData.babyVoltigoreHealth;
+	pev->health			= 400.0;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -1179,7 +1186,7 @@ void CMBabyVoltigore::HandleAnimEvent(MonsterEvent_t* pEvent)
 
 	case VOLTIGORE_AE_PUNCH_SINGLE:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(70, gSkillData.babyVoltigoreDmgPunch, DMG_CLUB | DMG_ALWAYSGIB);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(4, 7), DMG_CLUB | DMG_ALWAYSGIB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -1205,7 +1212,7 @@ void CMBabyVoltigore::HandleAnimEvent(MonsterEvent_t* pEvent)
 
 	case VOLTIGORE_AE_PUNCH_BOTH:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(70, gSkillData.babyVoltigoreDmgPunch, DMG_CLUB | DMG_ALWAYSGIB);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(9, 13), DMG_CLUB | DMG_ALWAYSGIB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))

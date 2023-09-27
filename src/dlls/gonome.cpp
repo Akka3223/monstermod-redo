@@ -134,14 +134,14 @@ void CGonomeGuts :: GutsTouch( edict_t *pOther )
 	else
 	{
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, VARS(pev->owner), gSkillData.gonomeDmgGuts, DMG_GENERIC );
+			UTIL_TakeDamage( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(15, 25), DMG_GENERIC );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage ( pev, VARS(pev->owner), gSkillData.gonomeDmgGuts, DMG_GENERIC );
+			pMonster->TakeDamage ( pev, VARS(pev->owner), RANDOM_FLOAT(15, 25), DMG_GENERIC );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), gSkillData.gonomeDmgGuts, DMG_GENERIC );
+			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(15, 25), DMG_GENERIC );
 	}
 	
 	SetThink( &CGonomeGuts::SUB_Remove );
@@ -483,7 +483,7 @@ void CMGonome::HandleAnimEvent(MonsterEvent_t *pEvent)
 
 	case GONOME_AE_SLASH_LEFT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, gSkillData.gonomeDmgOneSlash, DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_FLOAT(38, 45), DMG_SLASH);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -503,7 +503,7 @@ void CMGonome::HandleAnimEvent(MonsterEvent_t *pEvent)
 
 	case GONOME_AE_SLASH_RIGHT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, gSkillData.gonomeDmgOneSlash, DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_FLOAT(38, 45), DMG_SLASH);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -527,7 +527,7 @@ void CMGonome::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case GONOME_AE_BITE4:
 		{
 			int iPitch;
-			edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, gSkillData.gonomeDmgOneBite, DMG_SLASH);
+			edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_FLOAT(25, 35), DMG_SLASH);
 
 			if (pHurt)
 			{
@@ -615,7 +615,7 @@ void CMGonome::Spawn()
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects = 0;
-	pev->health = gSkillData.gonomeHealth;
+	pev->health = 800.0;
 	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState = MONSTERSTATE_NONE;
 

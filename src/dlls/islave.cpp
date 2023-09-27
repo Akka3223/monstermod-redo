@@ -209,7 +209,7 @@ void CMISlave :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case ISLAVE_AE_CLAW:
 		{
 			// SOUND HERE!
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.slaveDmgClaw, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(28, 35), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -230,7 +230,7 @@ void CMISlave :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 		case ISLAVE_AE_CLAWRAKE:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.slaveDmgClawrake, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(28, 35), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -423,7 +423,7 @@ void CMISlave :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= gSkillData.slaveHealth;
+	pev->health			= 800.0;
 	pev->view_ofs		= Vector ( 0, 0, 64 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= 0.5;
 	m_MonsterState		= MONSTERSTATE_NONE;
@@ -722,14 +722,14 @@ void CMISlave :: ZapBeam( int side )
 	if (pEntity != NULL && pEntity->v.takedamage)
 	{
 		if (UTIL_IsPlayer(pEntity))
-			UTIL_TraceAttack( pEntity, pev, gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK );
+			UTIL_TraceAttack( pEntity, pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK );
 		else if (pEntity->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
-			pMonster->TraceAttack( pev, gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK );
+			pMonster->TraceAttack( pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK );
 		}
 		else
-			UTIL_TraceAttack( pEntity, pev, gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK );
+			UTIL_TraceAttack( pEntity, pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK );
 	}
 
 	UTIL_EmitAmbientSound( ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG( 140, 160 ) );

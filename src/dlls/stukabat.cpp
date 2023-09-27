@@ -73,7 +73,7 @@ void CMStukabat :: HandleAnimEvent( MonsterEvent_t *pEvent )
 	{
 	case STUKABAT_AE_BITE:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.stukabatDmgBite, DMG_SLASH|DMG_POISON );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(20, 25), DMG_SLASH|DMG_POISON );
 			if ( pHurt )
 			{
 				// Play bite sound
@@ -106,7 +106,7 @@ void CMStukabat :: Spawn()
 	pev->movetype		= MOVETYPE_FLY;
 	pev->flags			|= FL_FLY;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
-	pev->health			= gSkillData.stukabatHealth;
+	pev->health			= 600.0;
 	pev->view_ofs		= Vector ( 0, 0, 22 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;

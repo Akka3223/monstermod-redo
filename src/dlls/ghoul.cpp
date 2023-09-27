@@ -158,7 +158,7 @@ void CMGhoul :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		{
 			// do stuff for this event.
 			ALERT( at_console, "Slash right!\n" );
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.zombieDmgOneSlash, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(20, 25), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -182,7 +182,7 @@ void CMGhoul :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		{
 			// do stuff for this event.
 			ALERT( at_console, "Slash left!\n" );
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.zombieDmgOneSlash, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(20, 25), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -244,7 +244,7 @@ void CMGhoul :: Spawn()
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
-	pev->health			= gSkillData.zombieHealth;
+	pev->health			= 600.0;
 	pev->view_ofs		= VEC_VIEW;// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;

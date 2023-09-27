@@ -160,14 +160,14 @@ void CSquidSpit :: SpitTouch ( edict_t *pOther )
 	else
 	{
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, pev, gSkillData.bullsquidDmgSpit, DMG_GENERIC );
+			UTIL_TakeDamage( pOther, pev, pev, RANDOM_FLOAT(11, 14), DMG_GENERIC );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage ( pev, pev, gSkillData.bullsquidDmgSpit, DMG_GENERIC );
+			pMonster->TakeDamage ( pev, pev, RANDOM_FLOAT(11, 14), DMG_GENERIC );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, pev, gSkillData.bullsquidDmgSpit, DMG_GENERIC );
+			UTIL_TakeDamageExternal( pOther, pev, pev, RANDOM_FLOAT(11, 14), DMG_GENERIC );
 	}
 
 	SetThink ( &CSquidSpit::SUB_Remove );
@@ -307,7 +307,7 @@ BOOL CMBullsquid :: CheckRangeAttack1 ( float flDot, float flDist )
 //=========================================================
 BOOL CMBullsquid :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
-	if ( m_hEnemy->v.health <= gSkillData.bullsquidDmgWhip && flDist <= 85 && flDot >= 0.7 )
+	if ( m_hEnemy->v.health <= /* RANDOM_FLOAT(9, 13) */ 25.0 && flDist <= 85 && flDot >= 0.7 )
 	{
 		return TRUE;
 	}
@@ -512,7 +512,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case BSQUID_AE_BITE:
 		{
 			// SOUND HERE!
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.bullsquidDmgBite, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(13, 17), DMG_SLASH );
 			
 			if ( pHurt )
 			{
@@ -526,7 +526,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 		case BSQUID_AE_TAILWHIP:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.bullsquidDmgWhip, DMG_CLUB | DMG_ALWAYSGIB );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(20, 25), DMG_CLUB | DMG_ALWAYSGIB );
 			if ( pHurt ) 
 			{
 				pHurt->v.punchangle.z = -20;
@@ -617,7 +617,7 @@ void CMBullsquid :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= gSkillData.bullsquidHealth;
+	pev->health			= 600.0;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
