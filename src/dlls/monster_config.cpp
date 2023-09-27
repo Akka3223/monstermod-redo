@@ -444,10 +444,11 @@ void scan_monster_cfg(FILE *fp)
 												if(rand == 1) {
 													m_d2category_monster[6] = 3;
 												} else if(rand == 2) {
-													m_d2category_monster[6] = 24;
+													//m_d2category_monster[6] = 24;
+													m_d2category_monster[6] = 3;
 												} else if(rand == 3) {
-													m_d2category_monster[6] = 0; // MISSING ADDITIONAL MOB
 													m_d2category_monster[6] = 24;
+													//m_d2category_monster[6] = 3;
 												}
 											} else if(val == 7) {
 												if(rand == 1) {

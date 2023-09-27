@@ -1654,6 +1654,7 @@ public:
 	Schedule_t *GetScheduleOfType(int Type);
 	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual void Killed(entvars_t *pevAttacker, int iGib);
+	void UpdateOnRemove();
 
 	CUSTOM_SCHEDULES
 
