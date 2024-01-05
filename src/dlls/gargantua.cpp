@@ -139,13 +139,13 @@ void CStomp::Think( void )
 		{
 			if (UTIL_IsPlayer(pEntity))
 				UTIL_TakeDamage(pEntity, pev, pevOwner, pev->dmg, DMG_SONIC);
-			else if (pEntity->v.euser4 != NULL)
+/* 			else if (pEntity->v.euser4 != NULL)
 			{
 				CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 				pMonster->TakeDamage(pev, pevOwner, pev->dmg, DMG_SONIC);
 			}
 			else
-				UTIL_TakeDamageExternal(pEntity, pev, pevOwner, pev->dmg, DMG_SONIC);
+				UTIL_TakeDamageExternal(pEntity, pev, pevOwner, pev->dmg, DMG_SONIC); */
 		}
 	}
 	

@@ -329,11 +329,11 @@ void CMHeadCrab :: LeapTouch ( edict_t *pOther )
 
 		if (UTIL_IsPlayer(pOther))
 			UTIL_TakeDamage( pOther, pev, pev, RANDOM_FLOAT(7, 9), DMG_SLASH );
-		else if (pOther->v.euser4 != NULL)
+	/* 	else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
 			pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(7, 9), DMG_SLASH );
-		}
+		} */
 	}
 
 	SetTouch( NULL );

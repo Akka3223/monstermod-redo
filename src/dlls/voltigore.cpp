@@ -151,13 +151,13 @@ void CMVoltigoreEnergyBall::FlyThink(void)
 			{
 				if ( UTIL_IsPlayer( pEntity ) )
 					UTIL_TakeDamage( pEntity, pev, pev, RANDOM_FLOAT(140, 220)/5, DMG_SHOCK );
-				else if (pEntity->v.euser4 != NULL)
+/* 				else if (pEntity->v.euser4 != NULL)
 				{
 					CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 					pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(140, 220)/5, DMG_SHOCK );
 				}
 				else
-					UTIL_TakeDamageExternal( pEntity, pev, pev, RANDOM_FLOAT(140, 220)/ 5, DMG_SHOCK );
+					UTIL_TakeDamageExternal( pEntity, pev, pev, RANDOM_FLOAT(140, 220)/ 5, DMG_SHOCK ); */
 			}
 		}
 		

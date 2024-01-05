@@ -561,13 +561,13 @@ void CMHoundeye :: SonicAttack ( void )
 				{
 					if (UTIL_IsPlayer(pEntity))
 						UTIL_TakeDamage( pEntity, pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
-					else if (pEntity->v.euser4 != NULL)
+				/* 	else if (pEntity->v.euser4 != NULL)
 					{
 						CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 						pMonster->TakeDamage( pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
 					}
 					else
-						UTIL_TakeDamageExternal( pEntity, pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
+						UTIL_TakeDamageExternal( pEntity, pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB ); */
 				}
 			}
 		}

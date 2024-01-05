@@ -361,7 +361,7 @@ void check_monster_dead(edict_t *pAttacker)
 
 							pent->v.deadflag = DEAD_NO;   // bring back to life
 							
-							monsters[index].pMonster->Killed(VARS(pent), 0);
+							monsters[index].pMonster->Killed(VARS(pAttacker), 0);
 							
 							monsters[index].killed = TRUE;
 						}
@@ -1444,7 +1444,7 @@ void mmDispatchThink( edict_t *pent )
 		{
 			monsters[index].pMonster->Think();
 
-			check_monster_dead(pent);
+			//check_monster_dead(pent);
 
 			RETURN_META(MRES_SUPERCEDE);
 		}
@@ -1466,7 +1466,7 @@ void mmDispatchTouch( edict_t *pentTouched, edict_t *pentOther )
 		{
 			monsters[index].pMonster->Touch(pentOther);
 
-			check_monster_dead(pentOther);
+			//check_monster_dead(pentOther);
 
 			RETURN_META(MRES_SUPERCEDE);
 		}
@@ -1811,8 +1811,8 @@ C_DLLEXPORT int GetEntityAPI2( DLL_FUNCTIONS *pFunctionTable, int *interfaceVers
 
 void mmDispatchThink_Post( edict_t *pent )
 {
-	check_monster_hurt(pent);
-	check_monster_dead(pent);
+	//check_monster_hurt(pent);
+	//check_monster_dead(pent);
 	
 	RETURN_META(MRES_IGNORED);
 }

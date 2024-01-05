@@ -1104,6 +1104,7 @@ void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacke
 			}
 			else if (pEntity->v.euser4 != NULL)
 			{
+				continue;
 				// UNDONE: this should check a damage mask, not an ignore
 				CMBaseEntity *pMonster = GetClassPtr((CMBaseEntity *)VARS(pEntity));
 
@@ -1155,6 +1156,7 @@ void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacke
 			}
 			else
 			{
+				continue;
 				edict_t *pMonster = pEntity;
 
 				if ( iClassIgnore != CLASS_NONE && pMonster->v.iuser4 == iClassIgnore )
@@ -1251,13 +1253,13 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 		{
 			if (UTIL_IsPlayer(pEntity))
 				UTIL_TakeDamage( pEntity, pev, pev, iDamage, iDmgType );
-			else if (pEntity->v.euser4 != NULL)
+/* 			else if (pEntity->v.euser4 != NULL)
 			{
 				CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 				pMonster->TakeDamage( pev, pev, iDamage, iDmgType );
 			}
 			else
-				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType );
+				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType ); */
 		}
 
 		return pEntity;
