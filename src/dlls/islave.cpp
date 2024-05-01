@@ -396,7 +396,11 @@ BOOL CMISlave :: CheckRangeAttack2 ( float flDot, float flDist )
 //jlb	else
 		return FALSE;
 }
-
+void CMISlave::UpdateOnRemove()
+{
+	CMBaseMonster::UpdateOnRemove();
+	ClearBeams();
+}
 
 //=========================================================
 // StartTask

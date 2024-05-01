@@ -723,6 +723,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		case 35: monsters[monster_index].pMonster = CreateClassPtr((CMSnake *)NULL); break;
 		case 36: monsters[monster_index].pMonster = CreateClassPtr((CMCrab *)NULL); break;
 		case 37: monsters[monster_index].pMonster = CreateClassPtr((CMGhoul *)NULL); break;
+		default: LOG_MESSAGE(PLID, "ERROR: Invalid monster type! (%i)", monster_type); return NULL;
 	}
 
 	if (monsters[monster_index].pMonster == NULL)
@@ -1254,6 +1255,28 @@ void SpawnViewerCommand(void)
 	LOG_MESSAGE(PLID, "spawns a node viewer at the player's location");
 }
 
+void DebugGetEntities(void)
+{
+	LOG_MESSAGE(PLID, "count: %i ents of max %i\n", monster_ents_used, MAX_MONSTER_ENTS);
+	for (int index = 0; index < MAX_MONSTER_ENTS; index++)
+	{
+		if (monsters[index].monster_index)
+		{
+			LOG_MESSAGE(PLID, "SLOT #%i:", index);
+			edict_t *pent = (*g_engfuncs.pfnPEntityOfEntIndex)(monsters[index].monster_index);
+
+			if (pent)
+			{
+				LOG_MESSAGE(PLID, "Class is \"%s\"\n", STRING(pent->v.classname));
+			}
+			else
+			{
+				LOG_MESSAGE(PLID, "NULL entity\n");
+			}
+		}
+	}
+}
+
 void mmGameDLLInit( void )
 {
 	// one time initialization stuff here...
@@ -1468,6 +1491,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 
 	(g_engfuncs.pfnAddServerCommand)("monster", MonsterCommand);
 	(g_engfuncs.pfnAddServerCommand)("node_viewer", SpawnViewerCommand);
+	(g_engfuncs.pfnAddServerCommand)("get_edicts", DebugGetEntities);
 	(g_engfuncs.pfnAddServerCommand)("_use", mmDispatchUse);
 
 	for (index = 0; monster_types[index].name[0]; index++)

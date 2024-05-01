@@ -30,7 +30,7 @@ typedef struct
    CMBaseMonster *pMonster;
 } monster_t;
 
-#define MAX_MONSTER_ENTS 400
+#define MAX_MONSTER_ENTS 768
 
 extern monster_t monsters[MAX_MONSTER_ENTS];
 
@@ -56,7 +56,7 @@ typedef struct
 
 // nodes.cpp defines 1024 max nodes, but that amount is likely to trigger a
 // no free edicts crash if the server num_edicts is low. Increase if needed.
-#define MAX_NODES 256
+#define MAX_NODES 384
 extern node_spawnpoint_t node_spawnpoint[MAX_NODES];
 
 extern DLL_GLOBAL short g_sModelIndexFireball;// holds the index for the fireball
