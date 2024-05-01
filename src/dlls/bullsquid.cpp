@@ -65,6 +65,7 @@ public:
 	void EXPORT Animate( void );
 
 	int  m_maxFrame;
+	EHANDLE m_hOwner;
 };
 
 void CSquidSpit:: Spawn( void )
@@ -110,14 +111,19 @@ void CSquidSpit::Shoot( entvars_t *pevOwner, Vector vecStart, Vector vecVelocity
 	UTIL_SetOrigin( pSpit->pev, vecStart );
 	pSpit->pev->velocity = vecVelocity;
 	pSpit->pev->owner = ENT(pevOwner);
+	pSpit->m_hOwner = ENT(pevOwner);
 
 	pSpit->SetThink ( &CSquidSpit::Animate );
 	pSpit->pev->nextthink = gpGlobals->time + 0.1;
 	pSpit->SetTouch ( &CSquidSpit::SpitTouch );
+	
 }
 
 void CSquidSpit :: SpitTouch ( edict_t *pOther )
 {
+	if (m_hOwner == NULL)
+		pev->owner = NULL;
+
 	TraceResult tr;
 	int		iPitch;
 
@@ -617,7 +623,7 @@ void CMBullsquid :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= 600.0;
+	if (!pev->health)	{ pev->health = 600.0;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 

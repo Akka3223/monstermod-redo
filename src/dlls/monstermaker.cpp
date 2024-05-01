@@ -259,6 +259,13 @@ void CMMonsterMaker::MakeMonster( void )
 		strcpy(keyvalue[7].key, "d2_category");
 		sprintf(keyvalue[7].value, "%i", m_d2category);
 	}
+	
+	// Custom health
+	if (pev->health)
+	{
+		strcpy(keyvalue[7].key, "health");
+		sprintf(keyvalue[7].value, "%f", pev->health);
+	}
 
 	// Attempt to spawn monster
 	m_iMonsterIndex = m_d2category_monster[m_d2category];

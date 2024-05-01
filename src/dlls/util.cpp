@@ -1565,8 +1565,8 @@ void UTIL_Remove( edict_t *pEntity )
 		return;
 
 //jlb	pEntity->UpdateOnRemove();
-	pEntity->v.flags |= FL_KILLME;
 	pEntity->v.targetname = 0;
+	pEntity->v.flags |= FL_KILLME;
 }
 
 

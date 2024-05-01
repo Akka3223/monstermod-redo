@@ -147,6 +147,7 @@ void FireTargets( const char *targetName, edict_t *pActivator, edict_t *pCaller,
 
 		// MonsterMod entity
 		CMBaseEntity *pTarget = CMBaseEntity::Instance( pentTarget );
+		
 		if ( pTarget && !(pTarget->pev->flags & FL_KILLME) )
 		{
 			ALERT( at_aiconsole, "Found: %s, firing (%s)\n", STRING(pTarget->pev->classname), targetName );
@@ -226,8 +227,8 @@ void CMBaseDelay :: SUB_UseTargets( edict_t *pActivator, USE_TYPE useType, float
 		pentKillTarget = FIND_ENTITY_BY_TARGETNAME( NULL, STRING(m_iszKillTarget) );
 		while ( !FNullEnt(pentKillTarget) )
 		{
-			UTIL_Remove( CMBaseEntity::Instance(pentKillTarget)->edict() );
-
+		//	UTIL_Remove( CMBaseEntity::Instance(pentKillTarget)->edict() );
+			UTIL_Remove( pentKillTarget );
 			ALERT( at_aiconsole, "killing %s\n", STRING( pentKillTarget->v.classname ) );
 			pentKillTarget = FIND_ENTITY_BY_TARGETNAME( pentKillTarget, STRING(m_iszKillTarget) );
 		}

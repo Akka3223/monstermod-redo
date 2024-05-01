@@ -1462,7 +1462,7 @@ void CTestHull :: Spawn( entvars_t *pevMasterNode )
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	pev->effects		= 0;
-	pev->health			= 50;
+	if (!pev->health)	{ pev->health = 50;
 	pev->yaw_speed		= 8;
 
 	if ( WorldGraph.m_fGraphPresent )
