@@ -139,13 +139,13 @@ void CStomp::Think( void )
 		{
 			if (UTIL_IsPlayer(pEntity))
 				UTIL_TakeDamage(pEntity, pev, pevOwner, pev->dmg, DMG_SONIC);
-/* 			else if (pEntity->v.euser4 != NULL)
+			else if (pEntity->v.euser4 != NULL)
 			{
 				CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 				pMonster->TakeDamage(pev, pevOwner, pev->dmg, DMG_SONIC);
 			}
 			else
-				UTIL_TakeDamageExternal(pEntity, pev, pevOwner, pev->dmg, DMG_SONIC); */
+				UTIL_TakeDamageExternal(pEntity, pev, pevOwner, pev->dmg, DMG_SONIC);
 		}
 	}
 	
@@ -815,9 +815,12 @@ void CMGargantua::DeathEffect( void )
 
 void CMGargantua::Killed( entvars_t *pevAttacker, int iGib )
 {
-	EyeOff();
-	UTIL_Remove( m_pEyeGlow->edict() );
-	m_pEyeGlow = NULL;
+	if ( m_pEyeGlow )
+	{
+		EyeOff();
+		UTIL_Remove( m_pEyeGlow->edict() );
+		m_pEyeGlow = NULL;
+	}
 	CMBaseMonster::Killed( pevAttacker, GIB_NEVER );
 }
 

@@ -15,7 +15,7 @@
 #include "monster_plugin.h"
 #include "ripent.h"
 #include "globalreplace.h"
-#include <stdlib.h>
+
 extern cvar_t *dllapi_log;
 extern cvar_t *monster_entity_config;
 
@@ -76,8 +76,12 @@ void scan_monster_sound(FILE *fp, edict_t *pMonster )
 	
 	while (get_input(fp, input))
 	{
-		char *source = strtok(input, " ");
-		char *destination = strtok(NULL, " ");
+		// might slip through
+		if (strlen(input) == 0)
+			continue;
+
+		char *source = strtok(input, " \t");
+		char *destination = strtok(NULL, " \t");
 
 		// Remove all quotes
 		char parse[128] = {0};
@@ -982,8 +986,12 @@ void scan_monster_replace(FILE *fp, bool toGSR )
 	
 	while (get_input(fp, input))
 	{
-		char *source = strtok(input, " ");
-		char *destination = strtok(NULL, " ");
+		// might slip through
+		if (strlen(input) == 0)
+			continue;
+
+		char *source = strtok(input, " \t");
+		char *destination = strtok(NULL, " \t");
 
 		// Remove all quotes
 		char parse[128] = {0};

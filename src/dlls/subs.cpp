@@ -75,8 +75,7 @@ void CMBaseEntity :: SUB_Remove( void )
 	}
 
 //	REMOVE_ENTITY(ENT(pev));
-
-	Remove_Entity(ENT(pev));
+   Remove_Entity(ENT(pev));
 }
 
 
@@ -279,11 +278,9 @@ void CMBaseDelay::DelayThink( void )
 		pActivator = ENT(pev->owner);
 	}
 	// The use type is cached (and stashed) in pev->button
-	UTIL_ClientPrintAll( HUD_PRINTTALK, "// The use type is cached (and stashed) in pev->button" );
-
 	SUB_UseTargets( pActivator, (USE_TYPE)pev->button, 0 );
 //	REMOVE_ENTITY(ENT(pev));
-   	Remove_Entity(ENT(pev));
+   Remove_Entity(ENT(pev));
 }
 
 

@@ -104,9 +104,8 @@ public:
 	
 	string_t			m_szMonsterName; // Monster name to display on HUD
 	int					m_iClassifyOverride; // Overriden classification for this monster
+	int					m_d2category;
 
-	int 				m_d2category;
-	
 	REPLACER::REPLACER	*m_srSoundList; // individual sound replacements for this monster
 	int					m_isrSounds; // number of replaced sounds
 
@@ -382,6 +381,36 @@ public:
 	virtual float GetSoundVolume( void ) { return 0.8; }
 };
 
+
+class CMZombie : public CMBaseMonster
+{
+public:
+	void Spawn( void );
+	void Precache( void );
+	void SetYawSpeed( void );
+	int  Classify ( void );
+	void HandleAnimEvent( MonsterEvent_t *pEvent );
+	int IgnoreConditions ( void );
+
+	float m_flNextFlinch;
+
+	void PainSound( void );
+	void AlertSound( void );
+	void IdleSound( void );
+	void AttackSound( void );
+
+	static const char *pAttackSounds[];
+	static const char *pIdleSounds[];
+	static const char *pAlertSounds[];
+	static const char *pPainSounds[];
+	static const char *pAttackHitSounds[];
+	static const char *pAttackMissSounds[];
+
+	// No range attacks
+	BOOL CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
+	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
+	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+};
 class CMGhoul : public CMBaseMonster
 {
 public:
@@ -414,38 +443,6 @@ public:
 	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 };
-
-class CMZombie : public CMBaseMonster
-{
-public:
-	void Spawn( void );
-	void Precache( void );
-	void SetYawSpeed( void );
-	int  Classify ( void );
-	void HandleAnimEvent( MonsterEvent_t *pEvent );
-	int IgnoreConditions ( void );
-
-	float m_flNextFlinch;
-
-	void PainSound( void );
-	void AlertSound( void );
-	void IdleSound( void );
-	void AttackSound( void );
-
-	static const char *pAttackSounds[];
-	static const char *pIdleSounds[];
-	static const char *pAlertSounds[];
-	static const char *pPainSounds[];
-	static const char *pAttackHitSounds[];
-	static const char *pAttackMissSounds[];
-
-	// No range attacks
-	BOOL CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
-	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
-	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
-};
-
-
 class CMSnake : public CMBaseMonster
 {
 public:
@@ -479,7 +476,34 @@ public:
 	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 };
+class CMCrab : public CMBaseMonster
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void HandleAnimEvent(MonsterEvent_t *pEvent);
+	void SetYawSpeed(void);
+	int ISoundMask();
 
+	int Classify(void);
+
+	void IdleSound(void);
+	void PainSound(void);
+	void AlertSound(void);
+	void DeathSound(void);
+	int IgnoreConditions(void);
+	void SetActivity ( Activity NewActivity );
+
+	float	m_flLastHurtTime;
+	float	m_flNextFlinch;
+
+	static const char *pIdleSounds[];
+	static const char *pAlertSounds[];
+	static const char *pPainSounds[];
+	static const char *pDieSounds[];
+	static const char *pAttackMissSounds[];
+	EHANDLE m_hOwner;
+};
 
 class CMSqueakGrenade : public CMGrenade
 {
@@ -803,6 +827,7 @@ public:
 	static const char *pAttackHitSounds[];
 	static const char *pAttackMissSounds[];
 	static const char *pAttackSounds[];
+	static const char *pFireSounds[];
 	static const char *pDieSounds[];
 	static const char *pPainSounds[];
 	static const char *pIdleSounds[];
@@ -1450,37 +1475,10 @@ public:
 	void EXPORT SpikeTouch(edict_t *pOther);
 	void EXPORT StartTrail();
 	static edict_t *Shoot(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, Vector vecAngles);
+
+	EHANDLE m_hOwner;
 };
-//=========================================================
-// Crab
-//=========================================================
-class CMCrab : public CMBaseMonster
-{
-public:
-	void Spawn(void);
-	void Precache(void);
-	void HandleAnimEvent(MonsterEvent_t *pEvent);
-	void SetYawSpeed(void);
-	int ISoundMask();
 
-	int Classify(void);
-
-	void IdleSound(void);
-	void PainSound(void);
-	void AlertSound(void);
-	void DeathSound(void);
-	int IgnoreConditions(void);
-	void SetActivity ( Activity NewActivity );
-
-	float	m_flLastHurtTime;
-	float	m_flNextFlinch;
-
-	static const char *pIdleSounds[];
-	static const char *pAlertSounds[];
-	static const char *pPainSounds[];
-	static const char *pDieSounds[];
-	static const char *pAttackMissSounds[];
-};
 //=========================================================
 // Pit Drone
 //=========================================================
@@ -1542,6 +1540,7 @@ public:
 	void AlertSound(void);
 	void MonsterThink(void);
 	void StartTask(Task_t* pTask);
+	void HandleAnimEvent(MonsterEvent_t *pEvent);
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 
 	static const char *pIdleSounds[];

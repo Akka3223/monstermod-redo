@@ -40,6 +40,7 @@ extern DLL_GLOBAL	BOOL	g_fDrawLines;
 extern CGraph WorldGraph;// the world node graph
 
 extern cvar_t *monster_turn_coeficient;
+extern cvar_t *monster_default_maxrange;
 
 extern void process_monster_sound(edict_t *pMonster, char *fileName);
 
@@ -171,7 +172,7 @@ void CMBaseMonster :: Look ( int iDistance )
 				{
 					/* MonsterMod monster looking at another MonsterMod monster */
 					CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pSightEnt));
-
+					
 					// the looker will want to consider this entity
 					// don't check anything else about an entity that can't be seen, or an entity that you don't care about.
 					if ( IRelationship( pMonster ) != R_NO && UTIL_FInViewCone( pSightEnt, ENT(pev), m_flFieldOfView ) && !FBitSet( pSightEnt->v.flags, FL_NOTARGET ) && UTIL_FVisible( pSightEnt, ENT(pev) ) )
@@ -1648,7 +1649,7 @@ void CMBaseMonster :: MonsterInit ( void )
 	SetBits (pev->flags, FL_MONSTER);
 	if ( pev->spawnflags & SF_MONSTER_HITMONSTERCLIP )
 		pev->flags |= FL_MONSTERCLIP;
-	
+
 	pev->iuser2 = m_d2category;
 
 	ClearSchedule();
@@ -1665,8 +1666,9 @@ void CMBaseMonster :: MonsterInit ( void )
 	for (int i=0; i < MAX_OLD_ENEMIES; i++)
 		m_hOldEnemy[ i ] = NULL;
 
-	m_flDistTooFar		= 1024.0;
-	m_flDistLook		= 2048.0;
+	if (!m_flDistLook)
+		m_flDistLook = monster_default_maxrange->value;
+	m_flDistTooFar = m_flDistLook / 2; // always 50%
 
 	// set eye position
 	SetEyePosition();
@@ -2656,6 +2658,11 @@ void CMBaseMonster :: KeyValue( KeyValueData *pkvd )
 		{
 			process_monster_sound(edict(), pkvd->szValue);
 		}
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "attackrange"))
+	{
+		m_flDistLook = atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else

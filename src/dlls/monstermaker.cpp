@@ -30,7 +30,8 @@
 #define SF_MONSTERMAKER_MONSTERCLIP	8 // Children are blocked by monsterclip
 extern int m_d2category_monster[];
 extern monster_type_t monster_types[];
-extern edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue, CMMonsterMaker *isMaker);
+extern edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue);
+
 
 // ========================================================
 void CMMonsterMaker :: KeyValue( KeyValueData *pkvd )
@@ -101,10 +102,7 @@ void CMMonsterMaker :: KeyValue( KeyValueData *pkvd )
 void CMMonsterMaker :: Spawn( )
 {
 	// likely omitted keyvalue, but it could truly be an alien grunt spawn
-	/* ALERT ( at_aiconsole, "[MONSTER] Spawned a monstermaker entity w [%d] Category\n", m_d2category);
-	//
-	ALERT ( at_aiconsole, "[MONSTER] Spawned a monstermaker m_iMonsterIndex [%d] [%s]\n", m_iMonsterIndex, STRING(pev->targetname));
-	 */if ( m_iMonsterIndex == 0 )
+	if ( m_iMonsterIndex == 0 )
 	{
 		if ( !monster_types[0].need_to_precache )
 		{
@@ -166,7 +164,6 @@ void CMMonsterMaker :: Precache( void )
 void CMMonsterMaker::MakeMonster( void )
 {
 	// monstermaker incorrectly setup or intentionally empty
-	char szMessage[129]; // To allow exactly 128 characters
 	if ( m_iMonsterIndex == -1 )
 	{
 		ALERT ( at_console, "[MONSTER] NULL Ent in MonsterMaker!\n" );
@@ -179,8 +176,6 @@ void CMMonsterMaker::MakeMonster( void )
 
 	if ( m_iMaxLiveChildren > 0 && m_cLiveChildren >= m_iMaxLiveChildren )
 	{// not allowed to make a new one yet. Too many live ones out right now.
-		sprintf( szMessage, "[MONSTER] MonsterMaker - not allowed to make a new one yet. Too many live ones out right now. %d > %d\n", m_cLiveChildren, m_iMaxLiveChildren );
-		//UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 		return;
 	}
 
@@ -253,24 +248,21 @@ void CMMonsterMaker::MakeMonster( void )
 		sprintf(keyvalue[6].value, "%i", m_iClassifyOverride);
 	}
 
-	// Classify override
 	if ( m_d2category )
 	{
 		strcpy(keyvalue[7].key, "d2_category");
 		sprintf(keyvalue[7].value, "%i", m_d2category);
 	}
+
 	// Attempt to spawn monster
 	m_iMonsterIndex = m_d2category_monster[m_d2category];
-	pent = spawn_monster( m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue, this);
-	
-
+	pent = spawn_monster(m_iMonsterIndex, pev->origin, pev->angles, createSF, keyvalue);
 	if ( pent == NULL )
 	{
-		sprintf( szMessage, "[MONSTER] MonsterMaker - failed to spawn monster! targetname: \"%s\"\n", STRING(pev->targetname) );
-		UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 		ALERT ( at_console, "[MONSTER] MonsterMaker - failed to spawn monster! targetname: \"%s\"\n", STRING(pev->targetname) );
 		return;
 	}
+	
 	// If I have a target, fire!
 	if ( !FStringNull ( pev->target ) )
 	{
@@ -278,12 +270,8 @@ void CMMonsterMaker::MakeMonster( void )
 		FireTargets( STRING(pev->target), this->edict(), this->edict(), USE_TOGGLE, 0 );
 	}
 	
-	pent->v.vuser1.x = pev->origin.x;
-	pent->v.vuser1.y = pev->origin.y;
-	pent->v.vuser1.z = pev->origin.z;
-	
 	pent->v.owner = edict();
-	
+
 	if ( !FStringNull( pev->netname ) )
 	{
 		// if I have a netname (overloaded), give the child monster that name as a targetname
@@ -306,8 +294,7 @@ void CMMonsterMaker::MakeMonster( void )
 		memcpy(pChild->m_srSoundList, m_srSoundList, sizeof(REPLACER::REPLACER));
 		pChild->m_isrSounds = m_isrSounds;
 	}
-	sprintf( szMessage, "[MONSTER] MonsterMaker - m_cLiveChildren + 1 = %d > %d\n", m_cLiveChildren, m_iMaxLiveChildren );
-	//UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
+
 	m_cLiveChildren++;// count this monster
 	m_cNumMonsters--;
 
@@ -367,8 +354,6 @@ void CMMonsterMaker :: DeathNotice ( entvars_t *pevChild )
 {
 	// ok, we've gotten the deathnotice from our child, now clear out its owner if we don't want it to fade.
 	m_cLiveChildren--;
-	if(m_cLiveChildren < 0)
-		m_cLiveChildren = 0;
 
 	if ( !m_fFadeChildren )
 	{

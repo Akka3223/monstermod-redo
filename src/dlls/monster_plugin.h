@@ -21,19 +21,16 @@ typedef struct
 
 
 class CMBaseMonster;
-class CMMonsterMaker;
 
 typedef struct
 {
    int monster_index;
    edict_t *monster_pent;
    bool killed;
-   int respawn_index;
    CMBaseMonster *pMonster;
-   CMMonsterMaker *monster_maker_ent;
 } monster_t;
 
-#define MAX_MONSTER_ENTS 4000 // increased from 200 so it can hold non-monster entities
+#define MAX_MONSTER_ENTS 400
 
 extern monster_t monsters[MAX_MONSTER_ENTS];
 
@@ -47,7 +44,7 @@ typedef struct {
    int d2_category;
 } monster_spawnpoint_t;
 
-#define MAX_MONSTERS 400
+#define MAX_MONSTERS 200
 extern monster_spawnpoint_t monster_spawnpoint[MAX_MONSTERS];
 
 // this is here to store if a node we want to spawn is an ordinary one, or a flying one

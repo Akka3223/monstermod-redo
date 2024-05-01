@@ -723,13 +723,13 @@ void CMISlave :: ZapBeam( int side )
 	{
 		if (UTIL_IsPlayer(pEntity))
 			UTIL_TraceAttack( pEntity, pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK );
-/* 		else if (pEntity->v.euser4 != NULL)
+		else if (pEntity->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 			pMonster->TraceAttack( pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK );
 		}
 		else
-			UTIL_TraceAttack( pEntity, pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK ); */
+			UTIL_TraceAttack( pEntity, pev, RANDOM_FLOAT(38, 45), vecAim, &tr, DMG_SHOCK );
 	}
 
 	UTIL_EmitAmbientSound( ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG( 140, 160 ) );

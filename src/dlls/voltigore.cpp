@@ -395,7 +395,7 @@ BOOL CMVoltigore::CheckRangeAttack1(float flDot, float flDist)
 		return FALSE;
 	}
 
-	if (flDist > 64 && flDist <= 784 && flDot >= 0.5 && gpGlobals->time >= m_flNextZapTime)
+	if (flDist > 64 && flDist <= m_flDistTooFar && flDot >= 0.5 && gpGlobals->time >= m_flNextZapTime)
 	{
 		if (m_hEnemy != 0)
 		{

@@ -121,7 +121,7 @@ DLL_DECALLIST gDecals[] = {
 	{ "{mommablob", -1 },	// DECAL_MOMMABIRTH		// BM Birth spray
 	{ "{mommablob", -1 },	// DECAL_MOMMASPLAT		// BM Mortar spray?? need decal
 };
-						
+
 monster_type_t monster_types[]=
 {
 	// These are just names. But to keep it consistent
@@ -246,6 +246,7 @@ void Remove_Entity(edict_t *pEdict)
 			break;
 		}
 	}
+	
 	REMOVE_ENTITY(pEdict);
 }
 
@@ -274,7 +275,6 @@ void monster_unload(void)
 void check_monster_hurt(edict_t *pAttacker)
 {
 	int index;
-	char szMessage[129]; // To allow exactly 128 characters
 	
 	for (index = 0; index < monster_ents_used; index++)
 	{
@@ -293,6 +293,11 @@ void check_monster_hurt(edict_t *pAttacker)
 						float distance, damage;
 
 						// location of attacker and location of enemy...
+					/* 	char szMessage[129]; // To allow exactly 128 characters
+						sprintf( szMessage, "pAttacker Name: %s", STRING(pAttacker->v.netname) );
+						UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
+ */
+
 						vecSrc = pAttacker->v.origin + pAttacker->v.view_ofs;
 						vecSpot = pent->v.origin;
 
@@ -315,7 +320,7 @@ void check_monster_hurt(edict_t *pAttacker)
 						pent->v.health = pent->v.fuser4;
 
 						ClearMultiDamage( );
-						monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB );
+						monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET | DMG_GIB_CORPSE );
 						ApplyMultiDamage( VARS(pAttacker), VARS(pAttacker) );
 					}
 
@@ -325,11 +330,6 @@ void check_monster_hurt(edict_t *pAttacker)
 			}
 			else
 			{
-				if(monsters[index].monster_maker_ent->m_iMaxLiveChildren == 1) {
-					monsters[index].monster_maker_ent->m_cLiveChildren = 0;
-				}
-				sprintf( szMessage, "the entity no longer exists and we didn't catch it dying\n" );
-				//UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 				// the entity no longer exists and we didn't catch it dying
 				FreeMonsterIndex(index);
 			}
@@ -340,7 +340,6 @@ void check_monster_hurt(edict_t *pAttacker)
 
 void check_monster_dead(edict_t *pAttacker)
 {
-	char szMessage[129]; // To allow exactly 128 characters
 	for (int index = 0; index < monster_ents_used; index++)
 	{
 		if (monsters[index].monster_index)
@@ -355,8 +354,6 @@ void check_monster_dead(edict_t *pAttacker)
 					{
 						if (monsters[index].killed == FALSE)
 						{
-							sprintf( szMessage, "WILL RESPAWN.\n" );
-							//UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
 							pent->v.flags &= ~FL_KILLME;  // clear FL_KILLME bit
 
 							pent->v.deadflag = DEAD_NO;   // bring back to life
@@ -593,7 +590,6 @@ void check_monster_info( edict_t *pPlayer )
 						classify = tr.pHit->v.iuser4;
 					}
 					monsterHealth = tr.pHit->v.health;
-					monsterFrags = tr.pHit->v.frags;
 					
 					// Unless it is strictly ally to us, treat as enemy monster
 					if ( classify == CLASS_HUMAN_PASSIVE || classify == CLASS_PLAYER_ALLY )
@@ -601,7 +597,7 @@ void check_monster_info( edict_t *pPlayer )
 					
 					// Prepare the message
 					char szInfo[257];
-					sprintf(szInfo, "%s:  %s\nHealth:  %.0f\nFrags:    %.0f\n", ( isAlly ? "Friend" : "Enemy" ), szName, monsterHealth, monsterFrags );
+					sprintf(szInfo, "%s:  %s\nHealth:  %.0f\n", ( isAlly ? "Friend" : "Enemy" ), szName, monsterHealth );
 					
 					// Create a TE_TEXTMESSAGE and show the monster information
 					MESSAGE_BEGIN( MSG_ONE, SVC_TEMPENTITY, NULL, pPlayer );
@@ -641,7 +637,7 @@ void check_monster_info( edict_t *pPlayer )
 	}
 }
 
-edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue, CMMonsterMaker *isMaker)
+edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawnflags, pKVD *keyvalue)
 {
 	int monster_index;
 	edict_t *monster_pent;
@@ -660,10 +656,10 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		char msg[256];
 
 		//META_CONS("[MONSTER] ERROR: You can't spawn monster %s since it wasn't precached!", monster_types[monster_type].name);
-		LOG_CONSOLE(PLID, "ERROR: You can't spawn monster %s [%i] since it wasn't precached!", monster_types[monster_type].name, monster_type);
+		LOG_MESSAGE(PLID, "ERROR: You can't spawn monster %s since it wasn't precached!", monster_types[monster_type].name);
 		
 		//META_CONS("[MONSTER] valid precached monster names are:");
-		LOG_CONSOLE(PLID, "valid precached monster names are:");
+		LOG_MESSAGE(PLID, "valid precached monster names are:");
 		msg[0] = 0;
 		for (int index = 0; monster_types[index].name[0]; index++)
 		{
@@ -674,7 +670,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 				if (strlen(msg) > 60)
 				{
 				   //META_CONS("[MONSTER] %s", msg);
-				   LOG_CONSOLE(PLID, "%s", msg);
+				   LOG_MESSAGE(PLID, "%s", msg);
 				   msg[0] = 0;
 				}
 			}
@@ -682,10 +678,9 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		if (msg[0])
 		{
 			//META_CONS("[MONSTER] %s", msg);
-			LOG_CONSOLE(PLID, "%s", msg);
+			LOG_MESSAGE(PLID, "%s", msg);
 		}
 		
-		LOG_CONSOLE(PLID, "ERROR: Here 2!");
 		return NULL;
 	}
 	
@@ -728,13 +723,12 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		case 35: monsters[monster_index].pMonster = CreateClassPtr((CMSnake *)NULL); break;
 		case 36: monsters[monster_index].pMonster = CreateClassPtr((CMCrab *)NULL); break;
 		case 37: monsters[monster_index].pMonster = CreateClassPtr((CMGhoul *)NULL); break;
-
 	}
 
 	if (monsters[monster_index].pMonster == NULL)
 	{
 		//META_CONS("[MONSTER] ERROR: Error Creating Monster!" );
-		LOG_CONSOLE(PLID, "ERROR: Error Creating Monster!");
+		LOG_MESSAGE(PLID, "ERROR: Error Creating Monster!");
 		return NULL;
 	}
 
@@ -742,11 +736,10 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	monsters[monster_index].monster_pent = monster_pent;
 
 	monsters[monster_index].monster_index = (*g_engfuncs.pfnIndexOfEdict)(monster_pent);
+
 	monster_pent->v.origin = origin;
 	monster_pent->v.angles = angles;
-	if(isMaker) {
-		monsters[monster_index].monster_maker_ent = isMaker;
-	}
+	
 	// Pass spawnflags first if no keyvalue data exists for it
 	monster_pent->v.spawnflags = spawnflags;
 	
@@ -763,11 +756,11 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 			}
 		}
 	}
+	
+	monsters[monster_index].pMonster->Spawn();
 	char extCmd[64];
 	sprintf( extCmd, "_monsterspawned %i %s\n", ENTINDEX( monster_pent ), STRING(monster_pent->v.classname));
-
 	SERVER_COMMAND( extCmd );
-	monsters[monster_index].pMonster->Spawn();
 	
 	// Only modify starting spawnflags for monsters, not for entities!
 	if ( monster_index <= 29 )
@@ -812,7 +805,7 @@ void check_respawn(void)
 			
 			keyvalue = monster_spawnpoint[index].keyvalue;
 			
-			if (spawn_monster(monster_type, origin, angles, spawnflags, keyvalue, NULL) == NULL)
+			if (spawn_monster(monster_type, origin, angles, spawnflags, keyvalue) == NULL)
 			{
 				// spawn_monster failed
 				ALERT( at_error, "[MONSTER] Failed to spawn %s at origin %f %f %f\n", monster_types[monster_type].name, origin.x, origin.y, origin.z );
@@ -852,91 +845,7 @@ void world_precache(void)
 
 	PRECACHE_MODEL("models/w_grenade.mdl");
 }
-void MonsterDeadCommand(void)
-{
-	if (CMD_ARGC() >= 5)
-	{
-		char szMessage[129]; // To allow exactly 128 characters
-	//	edict_t *entity = INDEXENT( atoi( CMD_ARGV( 1 ) ) );
-		edict_t *pent = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 1 ) ));
-		edict_t *attacker = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 2 ) ));
-		edict_t *monstermaker = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 4 ) ));
-		if (pent)
-		{
-			CMBaseEntity *pOwner = CMBaseEntity::Instance(monstermaker);
-			if ( pOwner )
-			{
-				sprintf( szMessage, "[MONSTER] MonsterMaker - Send Deathnotice to monstermaker\n");
-			//	UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
-				pOwner->DeathNotice( VARS(pent) );  
-			}
-			//UTIL_ClientPrintAll( HUD_PRINTTALK, "Killed?" );
-			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pent));
-			pMonster->Killed(VARS(attacker), atoi( CMD_ARGV( 3 ) ));
-		}
-	/* 	if(entity)
-		{
-			CMBaseEntity *pOwner = CMBaseEntity::Instance(entity->v.owner);
-			if ( pOwner )
-			{
-				sprintf( szMessage, "[MONSTER] MonsterMaker - Send Deathnotice to monstermaker %s\n", CMD_ARGV( 1 ));
-				UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
-				pOwner->DeathNotice( VARS(entity) );  
-			}
-		} */
-	}
-}
-void MonsterDamagedCommand(void)
-{
-	if (CMD_ARGC() >= 4)
-	{
-		char szMessage[129]; // To allow exactly 128 characters
-	//	edict_t *entity = INDEXENT( atoi( CMD_ARGV( 1 ) ) );
-		edict_t *pent = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 1 ) ));
-		edict_t *pAttacker = (*g_engfuncs.pfnPEntityOfEntIndex)(atoi( CMD_ARGV( 2 ) ));
-		if (pent)
-		{
-			//UTIL_ClientPrintAll( HUD_PRINTTALK, "Damaged?" );
-			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pent));
 
-			TraceResult tr;
-			Vector vecSrc, vecSpot;
-			float distance, damage;
-			damage = atof( CMD_ARGV( 3 ) );
-			// location of attacker and location of enemy...
-			vecSrc = pAttacker->v.origin + pAttacker->v.view_ofs;
-			vecSpot = pent->v.origin;
-
-			// distance the blood can travel from the body...
-			distance = (vecSpot - vecSrc).Length() + 100.0f;
-
-			// use aiming angles of attacker to trace blood splatter...
-			UTIL_MakeVectors(pAttacker->v.v_angle);
-
-			// start just beyond the attacker's body...
-			vecSrc = vecSrc + gpGlobals->v_forward * 20;
-			vecSpot = vecSrc + gpGlobals->v_forward * distance;
-
-			// trace a line ignoring enemies body...
-			UTIL_TraceLine ( vecSrc, vecSpot, dont_ignore_monsters, pAttacker, &tr );
-
-			ClearMultiDamage( );
-			pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB );
-			ApplyMultiDamage( VARS(pAttacker), VARS(pAttacker) );
-		}
-
-	/* 	if(entity)
-		{
-			CMBaseEntity *pOwner = CMBaseEntity::Instance(entity->v.owner);
-			if ( pOwner )
-			{
-				sprintf( szMessage, "[MONSTER] MonsterMaker - Send Deathnotice to monstermaker %s\n", CMD_ARGV( 1 ));
-				UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
-				pOwner->DeathNotice( VARS(entity) );  
-			}
-		} */
-	}
-}
 void MonsterCommand(void)
 {
 	int index;
@@ -1070,7 +979,7 @@ void MonsterCommand(void)
 						if (monster_angle.y < 0)
 							monster_angle.y += 360;
 
-						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL, NULL);
+						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL);
 
 						return;
 					}
@@ -1098,7 +1007,7 @@ void MonsterCommand(void)
 						if (monster_angle.y < 0)
 							monster_angle.y += 360;
 
-						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL, NULL);
+						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL);
 
 						return;
 					}
@@ -1126,7 +1035,7 @@ void MonsterCommand(void)
 						if (monster_angle.y < 0)
 							monster_angle.y += 360;
 
-						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL, NULL);
+						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL);
 
 						return;
 					}
@@ -1153,7 +1062,7 @@ void MonsterCommand(void)
 						if (monster_angle.y < 0)
 							monster_angle.y += 360;
 
-						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL, NULL);
+						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL);
 
 						return;
 					}
@@ -1180,7 +1089,7 @@ void MonsterCommand(void)
 						if (monster_angle.y < 0)
 							monster_angle.y += 360;
 
-						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL, NULL);
+						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL);
 
 						return;
 					}
@@ -1207,7 +1116,7 @@ void MonsterCommand(void)
 						if (monster_angle.y < 0)
 							monster_angle.y += 360;
 
-						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL, NULL);
+						spawn_monster(monster_type, v_src, monster_angle, spawnflags, NULL);
 
 						return;
 					}
@@ -1364,14 +1273,7 @@ int mmDispatchSpawn( edict_t *pent )
 		for (index = 0; index < MAX_MONSTER_ENTS; index++)
 		{
 			if (monsters[index].pMonster != NULL)
-			{
-				// // free the soundlists first!
-				// if (monsters[index].pMonster->m_srSoundList != NULL)
-				// 	free(monsters[index].pMonster->m_srSoundList);
-				// monsters[index].pMonster->m_srSoundList = NULL;
-
 				delete monsters[index].pMonster;
-			}
 		}
 		
 		// free any allocated keyvalue memory
@@ -1393,6 +1295,7 @@ int mmDispatchSpawn( edict_t *pent )
 
 		monster_spawn_count = 0;
 		node_spawn_count = 0;
+		
 		m_d2category_monster[0] = -1;
 		m_d2category_monster[1] = -1;
 		m_d2category_monster[2] = -1;
@@ -1401,6 +1304,7 @@ int mmDispatchSpawn( edict_t *pent )
 		m_d2category_monster[5] = -1;
 		m_d2category_monster[6] = -1;
 		m_d2category_monster[7] = -1;
+
 		monster_skill_init();
 
 		process_monster_precache_cfg();
@@ -1416,7 +1320,7 @@ int mmDispatchSpawn( edict_t *pent )
 		WorldGraph.InitGraph();
 		check_graph_time = gpGlobals->time + 2.00; // give enough gap
 
-		check_respawn_time = gpGlobals->time + 4.00;
+		check_respawn_time = gpGlobals->time + 7.00;
 
 		for (index = 0; index < MAX_MONSTER_ENTS; index++)
 		{
@@ -1444,7 +1348,7 @@ void mmDispatchThink( edict_t *pent )
 		{
 			monsters[index].pMonster->Think();
 
-			//check_monster_dead(pent);
+			check_monster_dead(pent);
 
 			RETURN_META(MRES_SUPERCEDE);
 		}
@@ -1466,7 +1370,7 @@ void mmDispatchTouch( edict_t *pentTouched, edict_t *pentOther )
 		{
 			monsters[index].pMonster->Touch(pentOther);
 
-			//check_monster_dead(pentOther);
+			check_monster_dead(pentOther);
 
 			RETURN_META(MRES_SUPERCEDE);
 		}
@@ -1559,15 +1463,12 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	CMSnake snake; // 35
 	CMCrab crab; // 36
 	CMGhoul ghoul; // 37
-
 	
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 
 	(g_engfuncs.pfnAddServerCommand)("monster", MonsterCommand);
 	(g_engfuncs.pfnAddServerCommand)("node_viewer", SpawnViewerCommand);
 	(g_engfuncs.pfnAddServerCommand)("_use", mmDispatchUse);
-	(g_engfuncs.pfnAddServerCommand)("monster_killed", MonsterDeadCommand);
-	(g_engfuncs.pfnAddServerCommand)("monster_damaged", MonsterDamagedCommand);
 
 	for (index = 0; monster_types[index].name[0]; index++)
 	{
@@ -1727,6 +1628,16 @@ void mmClientKill_Post( edict_t *pPlayer )
 	RETURN_META(MRES_IGNORED);
 }
 
+BOOL mmClientConnect( edict_t *pPlayer, const char *pszName, const char *pszAddress, char *szRejectReason )
+{
+	// stop any ambient_music that is playing
+	MESSAGE_BEGIN(MSG_ONE, SVC_STUFFTEXT, NULL, pPlayer);
+	WRITE_STRING("mp3 stop\n");
+	MESSAGE_END();
+
+	RETURN_META_VALUE( MRES_IGNORED, TRUE );
+}
+
 static DLL_FUNCTIONS gFunctionTable = 
 {
 	mmGameDLLInit,	//! pfnGameInit()	Initialize the game (one-time call after loading of game .dll)
@@ -1747,7 +1658,7 @@ static DLL_FUNCTIONS gFunctionTable =
 	NULL,			// pfnRestoreGlobalState
 	NULL,			// pfnResetGlobalState
 
-	NULL,			// pfnClientConnect
+	mmClientConnect,			//! pfnClientConnect
 	NULL,			// pfnClientDisconnect
 	NULL,			// pfnClientKill
 	NULL,			// pfnClientPutInServer
@@ -1811,8 +1722,8 @@ C_DLLEXPORT int GetEntityAPI2( DLL_FUNCTIONS *pFunctionTable, int *interfaceVers
 
 void mmDispatchThink_Post( edict_t *pent )
 {
-	//check_monster_hurt(pent);
-	//check_monster_dead(pent);
+	/* check_monster_hurt(pent);
+	check_monster_dead(pent); */
 	
 	RETURN_META(MRES_IGNORED);
 }

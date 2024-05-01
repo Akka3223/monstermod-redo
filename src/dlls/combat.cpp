@@ -309,7 +309,6 @@ void CMBaseMonster :: GibMonster( void )
 	BOOL		gibbed = FALSE;
 
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);		
-	char szMessage[129]; // To allow exactly 128 characters
 
 	// only humans throw skulls !!!UNDONE - eventually monsters will have their own sets of gibs
 	if ( HasHumanGibs() )
@@ -525,7 +524,6 @@ void CMBaseMonster::BecomeDead( void )
 	
 	// give the corpse half of the monster's original maximum health. 
 	pev->health = pev->max_health / 2;
-	pev->fuser4 = pev->health;
 	pev->max_health = 5; // max_health now becomes a counter for how many blood decals the corpse can place.
 
 	// make the corpse fly away from the attack vector
@@ -584,8 +582,8 @@ void CMBaseMonster::CallGibMonster( void )
 		pev->fuser4 = pev->health;
 	}
 	
-	//if ( ShouldFadeOnDeath() && !fade )
-		//UTIL_Remove(this->edict());
+	if ( ShouldFadeOnDeath() && !fade )
+		UTIL_Remove(this->edict());
 }
 
 
@@ -603,13 +601,6 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	if ( UTIL_IsPlayer( ENT( pevAttacker ) ) )
 		pevAttacker->frags += 1.0;
 	
-	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
-	CMBaseEntity *pOwner = CMBaseEntity::Instance(pev->owner);
-	if ( pOwner )
-	{
-		pOwner->DeathNotice( pev );  
-	}
-
 	if ( HasMemory( bits_MEMORY_KILLED ) )
 	{
 		if ( ShouldGibMonster( iGib ) )
@@ -625,7 +616,12 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	// Make sure this condition is fired too (TakeDamage breaks out before this happens on death)
 	SetConditions( bits_COND_LIGHT_DAMAGE );
 	
-
+	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
+	CMBaseEntity *pOwner = CMBaseEntity::Instance(pev->owner);
+	if ( pOwner )
+	{
+		pOwner->DeathNotice( pev );  
+	}
 
 	if	( ShouldGibMonster( iGib ) )
 	{
@@ -637,6 +633,7 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 		SetTouch( NULL );
 		BecomeDead();
 	}
+	
 	// don't let the status bar glitch for players.with <0 health.
 	if (pev->health < -99)
 	{
@@ -1104,7 +1101,6 @@ void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacke
 			}
 			else if (pEntity->v.euser4 != NULL)
 			{
-				continue;
 				// UNDONE: this should check a damage mask, not an ignore
 				CMBaseEntity *pMonster = GetClassPtr((CMBaseEntity *)VARS(pEntity));
 
@@ -1156,7 +1152,6 @@ void RadiusDamage( Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacke
 			}
 			else
 			{
-				continue;
 				edict_t *pMonster = pEntity;
 
 				if ( iClassIgnore != CLASS_NONE && pMonster->v.iuser4 == iClassIgnore )
@@ -1253,13 +1248,13 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 		{
 			if (UTIL_IsPlayer(pEntity))
 				UTIL_TakeDamage( pEntity, pev, pev, iDamage, iDmgType );
-/* 			else if (pEntity->v.euser4 != NULL)
+			else if (pEntity->v.euser4 != NULL)
 			{
 				CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 				pMonster->TakeDamage( pev, pev, iDamage, iDmgType );
 			}
 			else
-				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType ); */
+				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType );
 		}
 
 		return pEntity;
@@ -1333,7 +1328,7 @@ void CMBaseMonster :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vecto
 		case HITGROUP_GENERIC:
 			break;
 		case HITGROUP_HEAD:
-			flDamage *= 1; //gSkillData.monHead;
+			flDamage *= 3; //gSkillData.monHead;
 			break;
 		case HITGROUP_CHEST:
 			flDamage *= 1; //gSkillData.monChest;

@@ -274,7 +274,7 @@ void CMHoundeye :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	pev->health			= 400;
+	pev->health			= 400.0;
 	pev->yaw_speed		= 5;//!!! should we put this in the monster's changeanim function since turn rates may vary with state/anim?
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
@@ -561,13 +561,13 @@ void CMHoundeye :: SonicAttack ( void )
 				{
 					if (UTIL_IsPlayer(pEntity))
 						UTIL_TakeDamage( pEntity, pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
-				/* 	else if (pEntity->v.euser4 != NULL)
+					else if (pEntity->v.euser4 != NULL)
 					{
 						CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
 						pMonster->TakeDamage( pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
 					}
 					else
-						UTIL_TakeDamageExternal( pEntity, pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB ); */
+						UTIL_TakeDamageExternal( pEntity, pev, pev, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
 				}
 			}
 		}

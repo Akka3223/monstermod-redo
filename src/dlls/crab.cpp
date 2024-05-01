@@ -185,7 +185,7 @@ void CMCrab::Spawn()
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects = 0;
-	pev->health = 180.0;
+	pev->health = 120.0;
 	switch(RANDOM_LONG(1,4)) {
 		case 1: 
 			pev->skin = 0;

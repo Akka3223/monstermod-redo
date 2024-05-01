@@ -307,7 +307,7 @@ BOOL CMBullsquid :: CheckRangeAttack1 ( float flDot, float flDist )
 //=========================================================
 BOOL CMBullsquid :: CheckMeleeAttack1 ( float flDot, float flDist )
 {
-	if ( m_hEnemy->v.health <= /* RANDOM_FLOAT(9, 13) */ 25.0 && flDist <= 85 && flDot >= 0.7 )
+	if ( m_hEnemy->v.health <= 25.0 && flDist <= 85 && flDot >= 0.7 )
 	{
 		return TRUE;
 	}
@@ -512,7 +512,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case BSQUID_AE_BITE:
 		{
 			// SOUND HERE!
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(13, 17), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.bullsquidDmgBite, DMG_SLASH );
 			
 			if ( pHurt )
 			{
