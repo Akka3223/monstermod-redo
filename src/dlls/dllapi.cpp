@@ -190,7 +190,6 @@ float check_graph_time;
 bool process_monster_cfg(void);
 bool process_monster_precache_cfg(void);
 
-
 int GetMonsterIndex(void)
 {
 	int monster_index = -1;
