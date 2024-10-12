@@ -74,7 +74,7 @@ void CMSqueakGrenade :: Spawn( void )
 
 	pev->flags |= FL_MONSTER;
 	pev->takedamage		= DAMAGE_AIM;
-	if (!pev->health)	{ pev->health = gSkillData.snarkHealth;
+	pev->health = gSkillData.snarkHealth;
 	pev->gravity		= 0.5;
 	pev->friction		= 0.5;
 

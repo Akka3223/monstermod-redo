@@ -125,7 +125,7 @@ void CMTurret::Spawn()
 { 
 	Precache( );
 	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/turret.mdl"));
-	if (!pev->health)	{ pev->health = gSkillData.turretHealth;
+	pev->health = gSkillData.turretHealth;
 	m_HackedGunPos		= Vector( 0, 0, 12.75 );
 	m_flMaxSpin =		TURRET_MAXSPIN;
 	pev->view_ofs.z = 12.75;
@@ -165,7 +165,7 @@ void CMMiniTurret::Spawn()
 { 
 	Precache( );
 	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/miniturret.mdl"));
-	if (!pev->health)	{ pev->health = gSkillData.miniturretHealth;
+	pev->health = gSkillData.miniturretHealth;
 	m_HackedGunPos		= Vector( 0, 0, 12.75 );
 	m_flMaxSpin = 0;
 	pev->view_ofs.z = 12.75;
@@ -1019,7 +1019,7 @@ void CMSentry::Spawn()
 { 
 	Precache( );
 	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/sentry.mdl"));
-	if (!pev->health)	{ pev->health = gSkillData.sentryHealth;
+	pev->health = gSkillData.sentryHealth;
 	m_HackedGunPos		= Vector( 0, 0, 48 );
 	pev->view_ofs.z		= 48;
 	m_flMaxWait = 1E6;
