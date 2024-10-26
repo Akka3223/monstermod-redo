@@ -451,7 +451,7 @@ void CMAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 	case AGRUNT_AE_LEFT_PUNCH:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(47, 57), DMG_CLUB );
+			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(370, 400), DMG_CLUB );
 
 			if ( pHurt )
 			{
@@ -488,7 +488,7 @@ void CMAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 	case AGRUNT_AE_RIGHT_PUNCH:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(47, 57), DMG_CLUB );
+			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(370, 400), DMG_CLUB );
 
 			if ( pHurt )
 			{
@@ -543,7 +543,7 @@ void CMAGrunt :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	if (!pev->health)	{ pev->health = 1000.0;
+	pev->health = Tier5_HP;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 	m_afCapability		= 0;

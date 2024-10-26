@@ -1640,7 +1640,6 @@ void CMBaseMonster :: MonsterInit ( void )
 	pev->effects		= 0;
 	pev->takedamage		= DAMAGE_AIM;
 	pev->ideal_yaw		= pev->angles.y;
-	pev->max_health		= pev->health;
 	pev->deadflag		= DEAD_NO;
 	m_IdealMonsterState	= MONSTERSTATE_IDLE;// Assume monster will be idle, until proven otherwise
 
@@ -1651,7 +1650,32 @@ void CMBaseMonster :: MonsterInit ( void )
 		pev->flags |= FL_MONSTERCLIP;
 
 	pev->iuser2 = m_d2category;
+	switch(m_d2category)
+	{
+		case 1:
+			pev->health = Tier1_HP;
+			break;
+		case 2:
+			pev->health = Tier2_HP;
+			break;
+		case 3:
+			pev->health = Tier3_HP;
+			break;
+		case 4:
+			pev->health = Tier4_HP;
+			break;
+		case 5:
+			pev->health = Tier5_HP;
+			break;
+		case 6:
+			pev->health = Tier6_HP;
+			break;
+		case 7:
+			pev->health = Tier7_HP;
+			break;
+	}
 
+	pev->max_health		= pev->health;
 	ClearSchedule();
 	RouteClear();
 	InitBoneControllers( ); // FIX: should be done in Spawn

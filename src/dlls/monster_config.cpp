@@ -401,7 +401,27 @@ void scan_monster_cfg(FILE *fp)
 										
 										monster_spawnpoint[monster_spawn_count].d2_category = val;
 									
-				 						if(m_d2category_monster[val] == -1) {
+										// case 0: agrunt.Precache(); break;
+										// case 3: bigmomma.Precache(); break;
+										// case 4: bullsquid.Precache(); break;
+										// case 5: controller.Precache(); break;
+										// case 7: headcrab.Precache(); break;
+										// case 9: houndeye.Precache(); break;
+										// case 10: islave.Precache(); break;
+										// case 13: zombie.Precache(); break;
+										// case 18: gonome.Precache(); break;
+										// case 21: pitdrone.Precache(); break;
+										// case 24: voltigore.Precache(); break;
+										// case 25: babyvoltigore.Precache(); break;
+										// case 28: rgrunt.Precache(); break;
+										// case 29: stukabat.Precache(); break;
+										// case 35: snake.Precache(); break;
+										// case 36: crab.Precache(); break;
+										// case 37: ghoul.Precache(); break;
+										// case 38: bear.Precache(); break;
+
+				 						if(m_d2category_monster[val] == -1)
+										{
 											int rand = RANDOM_LONG(1,3);
 											if(val == 1) {
 												if(rand == 1) {
@@ -409,9 +429,9 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 2) {
 													m_d2category_monster[1] = 7;
 												} else if(rand == 3) {
-													m_d2category_monster[1] = 0; // SCORPION MISSING
-													m_d2category_monster[1] = 7;
+													m_d2category_monster[1] = 41;
 												}
+												m_d2category_monster[1] = 41;
 											} else if(val == 2) {
 												if(rand == 1) {
 													m_d2category_monster[2] = 21;
@@ -420,13 +440,14 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[2] = 25;
 												}
+												m_d2category_monster[2] = 40;
 											} else if(val == 3) {
 												if(rand == 1) {
 													m_d2category_monster[3] = 37;
 												} else if(rand == 2) {
 													m_d2category_monster[3] = 4;
 												} else if(rand == 3) {
-													m_d2category_monster[3] = 29;
+													m_d2category_monster[3] = 38;
 												}
 											} else if(val == 4) {
 												if(rand == 1) {
@@ -440,10 +461,11 @@ void scan_monster_cfg(FILE *fp)
 												if(rand == 1) {
 													m_d2category_monster[5] = 0;
 												} else if(rand == 2) {
-													m_d2category_monster[5] = 0; // REVENANT MISSING
+													m_d2category_monster[5] = 43; // REVENANT MISSING
 												} else if(rand == 3) {
-													m_d2category_monster[5] = 0; // MISSING ADDITIONAL MOB
+													m_d2category_monster[5] = 39;
 												}
+												m_d2category_monster[5] = 43;
 											} else if(val == 6) {
 												if(rand == 1) {
 													m_d2category_monster[6] = 3;
@@ -454,14 +476,16 @@ void scan_monster_cfg(FILE *fp)
 													m_d2category_monster[6] = 24;
 													//m_d2category_monster[6] = 3;
 												}
+												m_d2category_monster[6] = 44;
 											} else if(val == 7) {
 												if(rand == 1) {
 													m_d2category_monster[7] = 13;
 												} else if(rand == 2) {
-													m_d2category_monster[7] = 13; // MISSING MUMMY;
+													m_d2category_monster[7] = 42;
 												} else if(rand == 3) {
 													m_d2category_monster[7] = 13; // MISSING ADDITIONAL MOB
 												}
+												m_d2category_monster[7] = 42; // MISSING MUMMY;
 											}
 										}
 										int mIndex;

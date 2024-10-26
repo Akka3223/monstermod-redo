@@ -644,7 +644,7 @@ void CMVoltigore::Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	if (!pev->health)	{ pev->health = 3000.0;
+	pev->health = Tier6_HP;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -1152,7 +1152,7 @@ void CMBabyVoltigore::Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	if (!pev->health)	{ pev->health = 400.0;
+	pev->health = Tier2_HP;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
@@ -1186,7 +1186,7 @@ void CMBabyVoltigore::HandleAnimEvent(MonsterEvent_t* pEvent)
 
 	case VOLTIGORE_AE_PUNCH_SINGLE:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(4, 7), DMG_CLUB | DMG_ALWAYSGIB);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(16, 19), DMG_CLUB | DMG_ALWAYSGIB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -1212,7 +1212,7 @@ void CMBabyVoltigore::HandleAnimEvent(MonsterEvent_t* pEvent)
 
 	case VOLTIGORE_AE_PUNCH_BOTH:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(9, 13), DMG_CLUB | DMG_ALWAYSGIB);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(16, 19), DMG_CLUB | DMG_ALWAYSGIB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))

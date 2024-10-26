@@ -166,14 +166,14 @@ void CSquidSpit :: SpitTouch ( edict_t *pOther )
 	else
 	{
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, pev, RANDOM_FLOAT(11, 14), DMG_GENERIC );
+			UTIL_TakeDamage( pOther, pev, pev, RANDOM_FLOAT(20, 24), DMG_GENERIC );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage ( pev, pev, RANDOM_FLOAT(11, 14), DMG_GENERIC );
+			pMonster->TakeDamage ( pev, pev, RANDOM_FLOAT(20, 24), DMG_GENERIC );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, pev, RANDOM_FLOAT(11, 14), DMG_GENERIC );
+			UTIL_TakeDamageExternal( pOther, pev, pev, RANDOM_FLOAT(20, 24), DMG_GENERIC );
 	}
 
 	SetThink ( &CSquidSpit::SUB_Remove );
@@ -518,7 +518,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case BSQUID_AE_BITE:
 		{
 			// SOUND HERE!
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.bullsquidDmgBite, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(70,75), DMG_SLASH );
 			
 			if ( pHurt )
 			{
@@ -532,7 +532,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 		case BSQUID_AE_TAILWHIP:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(20, 25), DMG_CLUB | DMG_ALWAYSGIB );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(90,110), DMG_CLUB | DMG_ALWAYSGIB );
 			if ( pHurt ) 
 			{
 				pHurt->v.punchangle.z = -20;
@@ -623,7 +623,7 @@ void CMBullsquid :: Spawn()
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects		= 0;
-	if (!pev->health)	{ pev->health = 600.0;
+	pev->health = Tier3_HP;
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 

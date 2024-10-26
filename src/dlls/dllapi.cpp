@@ -170,9 +170,15 @@ monster_type_t monster_types[]=
 	"monster_snake", FALSE,
 	"monster_crab", FALSE,
 	"monster_ghoul", FALSE,
+	"monster_bear", FALSE,
+	"monster_demonguard", FALSE,
+	"monster_hound", FALSE,
+	"monster_shalespider", FALSE,
+	"monster_mummy", FALSE,
+	"monster_revenant", FALSE,
+	"monster_infernal", FALSE,
 	"", FALSE
 };
-
 monster_t monsters[MAX_MONSTER_ENTS];
 int monster_ents_used = 0;
 
@@ -722,6 +728,13 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		case 35: monsters[monster_index].pMonster = CreateClassPtr((CMSnake *)NULL); break;
 		case 36: monsters[monster_index].pMonster = CreateClassPtr((CMCrab *)NULL); break;
 		case 37: monsters[monster_index].pMonster = CreateClassPtr((CMGhoul *)NULL); break;
+		case 38: monsters[monster_index].pMonster = CreateClassPtr((CMBear *)NULL); break;
+		case 39: monsters[monster_index].pMonster = CreateClassPtr((CMDemonGuard *)NULL); break;
+		case 40: monsters[monster_index].pMonster = CreateClassPtr((CMFelHound *)NULL); break;
+		case 41: monsters[monster_index].pMonster = CreateClassPtr((CMShaleSpider *)NULL); break;
+		case 42: monsters[monster_index].pMonster = CreateClassPtr((CMMummy *)NULL); break;
+		case 43: monsters[monster_index].pMonster = CreateClassPtr((CMRevenant *)NULL); break;
+		case 44: monsters[monster_index].pMonster = CreateClassPtr((CMInfernal *)NULL); break;
 		default: LOG_MESSAGE(PLID, "ERROR: Invalid monster type! (%i)", monster_type); return NULL;
 	}
 
@@ -1485,7 +1498,13 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	CMSnake snake; // 35
 	CMCrab crab; // 36
 	CMGhoul ghoul; // 37
-	
+	CMBear bear; // 38
+	CMDemonGuard DemonGuard; // 39
+	CMFelHound Hound; // 40
+	CMShaleSpider Shalespider; // 41
+	CMMummy mummy; // 42
+	CMRevenant revenant; // 43
+	CMInfernal infernal; // 44
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 
 	(g_engfuncs.pfnAddServerCommand)("monster", MonsterCommand);
@@ -1539,6 +1558,13 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 				case 35: snake.Precache(); break;
 				case 36: crab.Precache(); break;
 				case 37: ghoul.Precache(); break;
+				case 38: bear.Precache(); break;
+				case 39: DemonGuard.Precache(); break;
+				case 40: Hound.Precache(); break;
+				case 41: Shalespider.Precache(); break;
+				case 42: mummy.Precache(); break;
+				case 43: revenant.Precache(); break;
+				case 44: infernal.Precache(); break;
 			}
 		}
 	}

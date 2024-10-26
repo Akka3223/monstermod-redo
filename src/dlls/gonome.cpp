@@ -615,7 +615,7 @@ void CMGonome::Spawn()
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects = 0;
-	pev->health = 800.0;
+	pev->health = Tier4_HP;
 	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState = MONSTERSTATE_NONE;
 

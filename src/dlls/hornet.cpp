@@ -79,7 +79,7 @@ void CMHornet :: Spawn( void )
 		pSoundEnt = edict();
 
 	// no real owner, or owner isn't a client. 
-	pev->dmg = RANDOM_FLOAT(20, 30);
+	pev->dmg = RANDOM_FLOAT(70, 80);
 	
 	pev->nextthink = gpGlobals->time + 0.1;
 	ResetSequenceInfo( );

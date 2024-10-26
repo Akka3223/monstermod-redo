@@ -96,14 +96,14 @@ void CPitdroneSpike::SpikeTouch(edict_t *pOther)
 			pevOwner = pev;
 
 		if ( UTIL_IsPlayer( pOther ) )
-			UTIL_TakeDamage( pOther, pev, pevOwner, RANDOM_FLOAT(4, 7), DMG_GENERIC | DMG_NEVERGIB );
+			UTIL_TakeDamage( pOther, pev, pevOwner, RANDOM_FLOAT(6, 8), DMG_GENERIC | DMG_NEVERGIB );
 		else if ( pOther->v.euser4 != NULL )
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage( pev, pevOwner, RANDOM_FLOAT(4, 7), DMG_GENERIC | DMG_NEVERGIB );
+			pMonster->TakeDamage( pev, pevOwner, RANDOM_FLOAT(6, 8), DMG_GENERIC | DMG_NEVERGIB );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, pevOwner, RANDOM_FLOAT(4, 7), DMG_GENERIC | DMG_NEVERGIB );
+			UTIL_TakeDamageExternal( pOther, pev, pevOwner, RANDOM_FLOAT(6, 8), DMG_GENERIC | DMG_NEVERGIB );
 
 		if (RANDOM_LONG(0,1))
 			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/xbow_hitbod1.wav", 1, ATTN_NORM, 0, iPitch);
@@ -394,7 +394,7 @@ void CMPitdrone::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case PIT_DRONE_AE_THROW:
 	{
 		// SOUND HERE (in the pitdrone model)
-		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(5, 8), DMG_SLASH );
+		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(12, 14), DMG_SLASH );
 
 		if( pHurt )
 		{
@@ -427,7 +427,7 @@ void CMPitdrone::HandleAnimEvent(MonsterEvent_t *pEvent)
 		 * Pitdrone always starts the attack with the right claw so we use shouldAttackWithLeftClaw to check which claw is used now.
 		 */
 		// SOUND HERE (in the pitdrone model)
-		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(9, 13), DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(12, 14), DMG_SLASH);
 		if (pHurt)
 		{
 			if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -578,7 +578,7 @@ void CMPitdrone::Spawn()
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects = 0;
-	pev->health = 400.0;
+	pev->health = Tier2_HP;
 	m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState = MONSTERSTATE_NONE;
 

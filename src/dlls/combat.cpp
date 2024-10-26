@@ -598,8 +598,8 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	BOOL			fDone = FALSE;
 	
 	// If a player killed this monster, add score
-	if ( UTIL_IsPlayer( ENT( pevAttacker ) ) )
-		pevAttacker->frags += 1.0;
+	//if ( UTIL_IsPlayer( ENT( pevAttacker ) ) )
+	//	pevAttacker->frags += 1.0;
 	
 	if ( HasMemory( bits_MEMORY_KILLED ) )
 	{
@@ -984,7 +984,6 @@ int CMBaseMonster :: DeadTakeDamage( entvars_t *pevInflictor, entvars_t *pevAtta
 		{
 			vecDir = (UTIL_Center(ENT(pevInflictor)) - Vector(0, 0, 10) - Center()).Normalize();
 			vecDir = g_vecAttackDir = vecDir.Normalize();
-		}
 		}
 	}
 

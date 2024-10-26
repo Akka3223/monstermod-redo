@@ -124,7 +124,7 @@ void CMCrab::HandleAnimEvent(MonsterEvent_t *pEvent)
 	{
 	case CRAB_ATTACK_RIGHT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(7, 9), DMG_SLASH );
+		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(8, 9), DMG_SLASH );
 		if( pHurt )
 		{
 			if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -141,7 +141,7 @@ void CMCrab::HandleAnimEvent(MonsterEvent_t *pEvent)
 
 	case CRAB_ATTACK_LEFT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(7, 9), DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(8, 9), DMG_SLASH);
 		if (pHurt)
 		{
 			if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -185,7 +185,7 @@ void CMCrab::Spawn()
 	pev->movetype = MOVETYPE_STEP;
 	m_bloodColor = !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
 	pev->effects = 0;
-	pev->health = 120.0;
+	pev->health = Tier1_HP;
 	switch(RANDOM_LONG(1,4)) {
 		case 1: 
 			pev->skin = 0;
