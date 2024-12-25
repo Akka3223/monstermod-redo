@@ -172,7 +172,7 @@ void CMInfernal :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case INFERNAL_ATT:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 170, RANDOM_FLOAT(450.0, 570.0), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 170, RANDOM_FLOAT(1100.0, 1200.0), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -193,7 +193,7 @@ void CMInfernal :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case INFERNAL_ATT2:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 170, RANDOM_FLOAT(450.0, 570.0), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 170, RANDOM_FLOAT(1100.0, 1200.0), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -224,7 +224,7 @@ void CMInfernal::SetActivity(Activity NewActivity)
 	switch (m_Activity)
 	{
 	default:
-		m_flGroundSpeed = 100.0;
+		m_flGroundSpeed = 120.0;
 		break;
 	}
 }
