@@ -568,7 +568,7 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case VOLTIGORE_AE_PUNCH_SINGLE:
 	{
 		// SOUND HERE!
-		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_FLOAT(105, 165), DMG_CLUB);
+		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_FLOAT(700, 800), DMG_CLUB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -595,7 +595,7 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case VOLTIGORE_AE_PUNCH_BOTH:
 	{
 		// SOUND HERE!
-		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_FLOAT(105, 165), DMG_CLUB);
+		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_FLOAT(800, 900), DMG_CLUB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
