@@ -423,7 +423,8 @@ void scan_monster_cfg(FILE *fp)
 				 						if(m_d2category_monster[val] == -1)
 										{
 											int rand = RANDOM_LONG(1,3);
-											if(val == 1) {
+											if(val == 1)
+											{
 												if(rand == 1) {
 													m_d2category_monster[1] = 36;
 												} else if(rand == 2) {
@@ -431,17 +432,17 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[1] = 41;
 												}
-												m_d2category_monster[1] = 41;
-											} else if(val == 2) {
+											}
+											else if(val == 2) {
 												if(rand == 1) {
 													m_d2category_monster[2] = 21;
 												} else if(rand == 2) {
 													m_d2category_monster[2] = 9;
 												} else if(rand == 3) {
-													m_d2category_monster[2] = 25;
+													m_d2category_monster[2] = 40;
 												}
-												m_d2category_monster[2] = 40;
-											} else if(val == 3) {
+											}
+											else if(val == 3) {
 												if(rand == 1) {
 													m_d2category_monster[3] = 37;
 												} else if(rand == 2) {
@@ -449,7 +450,8 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[3] = 38;
 												}
-											} else if(val == 4) {
+											}
+											else if(val == 4) {
 												if(rand == 1) {
 													m_d2category_monster[4] = 5;
 												} else if(rand == 2) {
@@ -457,7 +459,8 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[4] = 18;
 												}
-											} else if(val == 5) {
+											}
+											else if(val == 5) {
 												if(rand == 1) {
 													m_d2category_monster[5] = 0;
 												} else if(rand == 2) {
@@ -465,19 +468,19 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[5] = 39;
 												}
-												m_d2category_monster[5] = 43;
-											} else if(val == 6) {
+											}
+											else if(val == 6)
+											{
 												if(rand == 1) {
 													m_d2category_monster[6] = 3;
 												} else if(rand == 2) {
-													//m_d2category_monster[6] = 24;
-													m_d2category_monster[6] = 3;
+													m_d2category_monster[6] = 44;
 												} else if(rand == 3) {
 													m_d2category_monster[6] = 24;
-													//m_d2category_monster[6] = 3;
 												}
-												m_d2category_monster[6] = 44;
-											} else if(val == 7) {
+											}
+											else if(val == 7)
+											{
 												if(rand == 1) {
 													m_d2category_monster[7] = 13;
 												} else if(rand == 2) {
@@ -485,7 +488,6 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[7] = 13; // MISSING ADDITIONAL MOB
 												}
-												m_d2category_monster[7] = 42; // MISSING MUMMY;
 											}
 										}
 										int mIndex;
