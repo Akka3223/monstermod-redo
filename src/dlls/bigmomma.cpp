@@ -365,7 +365,7 @@ void CMBigMomma :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			{
 				if (UTIL_IsPlayer(pHurt))
 				{
-					UTIL_TakeDamage( pHurt, pev, pev, RANDOM_FLOAT(70, 110), DMG_CRUSH | DMG_SLASH );
+					UTIL_TakeDamage( pHurt, pev, pev, RANDOM_FLOAT(800, 900), DMG_CRUSH | DMG_SLASH );
 					pHurt->v.punchangle.x = 15;
 					switch( pEvent->event )
 					{
@@ -389,7 +389,7 @@ void CMBigMomma :: HandleAnimEvent( MonsterEvent_t *pEvent )
             {
 					CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pHurt));
 
-					pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(70, 110), DMG_CRUSH | DMG_SLASH );
+					pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(800, 900), DMG_CRUSH | DMG_SLASH );
 					pMonster->pev->punchangle.x = 15;
 					switch( pEvent->event )
 					{
@@ -1200,7 +1200,7 @@ void CMBMortar::Touch( edict_t *pOther )
 	if ( pev->owner )
 		pevOwner = VARS(pev->owner);
 
-	RadiusDamage( pev->origin, pev, pevOwner, RANDOM_FLOAT(140, 220), gSkillData.bigmommaRadiusBlast, CLASS_NONE, DMG_ACID );
+	RadiusDamage( pev->origin, pev, pevOwner, RANDOM_FLOAT(600, 700), gSkillData.bigmommaRadiusBlast, CLASS_NONE, DMG_ACID );
 	UTIL_Remove( this->edict() );
 }
 
