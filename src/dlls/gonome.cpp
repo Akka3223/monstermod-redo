@@ -134,14 +134,14 @@ void CGonomeGuts :: GutsTouch( edict_t *pOther )
 	else
 	{
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(15, 25), DMG_GENERIC );
+			UTIL_TakeDamage( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(120, 130), DMG_GENERIC );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage ( pev, VARS(pev->owner), RANDOM_FLOAT(15, 25), DMG_GENERIC );
+			pMonster->TakeDamage ( pev, VARS(pev->owner), RANDOM_FLOAT(120, 130), DMG_GENERIC );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(15, 25), DMG_GENERIC );
+			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(120, 130), DMG_GENERIC );
 	}
 	
 	SetThink( &CGonomeGuts::SUB_Remove );

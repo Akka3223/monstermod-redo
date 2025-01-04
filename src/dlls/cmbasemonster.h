@@ -28,9 +28,9 @@ const float Tier1_HP = 70.0;
 const float Tier2_HP = 300.0;
 const float Tier3_HP = 1000.0;
 const float Tier4_HP = 1800.0;
-const float Tier5_HP = 2400.0;
-const float Tier6_HP = 6000.0;
-const float Tier7_HP = 1300.0;
+const float Tier5_HP = 	2400.0;
+const float Tier6_HP = 12000.0;
+const float Tier7_HP = 850.0;
 /* MONSTER	HEALTH	DROP RANGE	EXP	GOLD
 Head Crab	75		160-200	11-21	6-16+
 Hound Eye	310		80-110	11-21	8-18+
@@ -1323,6 +1323,7 @@ public:
 	float GetNodeDelay( void );
 	float GetNodeRange( void );
 	float GetNodeYaw( void );
+	float m_flNextAttack;
 
 	// Restart the crab count on each new level
 	void OverrideReset( void )

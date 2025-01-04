@@ -179,7 +179,7 @@ void CMRevenant :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case ZOMBIE_AE_ATTACK_BOTH:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 90, RANDOM_FLOAT(370, 400), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 90, RANDOM_FLOAT(200, 250), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )

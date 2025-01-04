@@ -367,7 +367,7 @@ void CMMonsterMaker :: DeathNotice ( entvars_t *pevChild )
 {
 	// ok, we've gotten the deathnotice from our child, now clear out its owner if we don't want it to fade.
 	m_cLiveChildren--;
-
+	pevChild->owner->v.nextthink = gpGlobals->time + m_flDelay;
 	if ( !m_fFadeChildren )
 	{
 		pevChild->owner = NULL;

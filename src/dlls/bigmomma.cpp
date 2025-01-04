@@ -341,6 +341,8 @@ void CMBigMomma :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case BIG_AE_MELEE_ATTACK1:
 		{
 			Vector forward, right;
+			
+			m_flNextAttack = gpGlobals->time + 2;
 
 			UTIL_MakeVectorsPrivate( pev->angles, forward, right, NULL );
 
@@ -365,7 +367,7 @@ void CMBigMomma :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			{
 				if (UTIL_IsPlayer(pHurt))
 				{
-					UTIL_TakeDamage( pHurt, pev, pev, RANDOM_FLOAT(800, 900), DMG_CRUSH | DMG_SLASH );
+					UTIL_TakeDamage( pHurt, pev, pev, 350, DMG_CRUSH | DMG_SLASH );
 					pHurt->v.punchangle.x = 15;
 					switch( pEvent->event )
 					{
@@ -386,10 +388,10 @@ void CMBigMomma :: HandleAnimEvent( MonsterEvent_t *pEvent )
 					EMIT_SOUND_DYN( edict(), CHAN_WEAPON, RANDOM_SOUND_ARRAY(pAttackHitSounds), 1.0, ATTN_NORM, 0, 100 + RANDOM_LONG(-5,5) );
 				}
 				else if (pHurt->v.euser4 != NULL)
-            {
+            	{
 					CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pHurt));
 
-					pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(800, 900), DMG_CRUSH | DMG_SLASH );
+					pMonster->TakeDamage( pev, pev, 350, DMG_CRUSH | DMG_SLASH );
 					pMonster->pev->punchangle.x = 15;
 					switch( pEvent->event )
 					{
@@ -553,7 +555,7 @@ void CMBigMomma :: LayHeadcrab( void )
 		}
 		else
 		{
-			m_crabTime = gpGlobals->time + RANDOM_FLOAT( 0.5, 2.5 );
+			m_crabTime = gpGlobals->time + RANDOM_FLOAT( 2.5, 3.5 );
 			Remember( bits_MEMORY_CHILDPAIR );
 		}
 
@@ -610,12 +612,13 @@ void CMBigMomma :: Spawn()
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= !m_bloodColor ? BLOOD_COLOR_YELLOW : m_bloodColor;
-	pev->health = Tier6_HP;
+	pev->health = Tier6_HP * 3;
 	pev->view_ofs		= Vector ( 0, 0, 128 );// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= 0.3;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState		= MONSTERSTATE_NONE;
 
 	MonsterInit();
+	pev->health = Tier6_HP * 3;
 	
 	pev->classname = MAKE_STRING( "monster_bigmomma" );
 	if ( strlen( STRING( m_szMonsterName ) ) == 0 )
@@ -700,7 +703,7 @@ void CMBigMomma::NodeReach( void )
 		return;
 
 	if ( pTarget->v.health )
-		pev->max_health = pev->health = pTarget->v.health * gSkillData.bigmommaHealthFactor;
+		pev->max_health = pev->health = Tier6_HP * 3;//pTarget->v.health * gSkillData.bigmommaHealthFactor;
 
 	if ( !HasMemory( bits_MEMORY_FIRED_NODE ) )
 	{
@@ -718,6 +721,11 @@ void CMBigMomma::NodeReach( void )
 	// Slash
 BOOL CMBigMomma::CheckMeleeAttack1( float flDot, float flDist )
 {
+	if (m_flNextAttack > gpGlobals->time)
+	{
+		return FALSE;
+	}
+
 	if (flDot >= 0.7)
 	{
 		if ( flDist <= BIG_ATTACKDIST )
@@ -1200,7 +1208,7 @@ void CMBMortar::Touch( edict_t *pOther )
 	if ( pev->owner )
 		pevOwner = VARS(pev->owner);
 
-	RadiusDamage( pev->origin, pev, pevOwner, RANDOM_FLOAT(600, 700), gSkillData.bigmommaRadiusBlast, CLASS_NONE, DMG_ACID );
+	RadiusDamage( pev->origin, pev, pevOwner, 300.0, 400.0/*radius*/, CLASS_NONE, DMG_ACID );
 	UTIL_Remove( this->edict() );
 }
 
