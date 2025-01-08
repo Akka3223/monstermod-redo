@@ -127,7 +127,7 @@ void CMDemonGuard::HandleAnimEvent(MonsterEvent_t *pEvent)
 	{
 		case GUARD_ATTACK_RIGHT:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 100, RANDOM_FLOAT(200, 250), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 100, RANDOM_LONG(190, 230), DMG_SLASH );
 			if( pHurt )
 			{
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -145,7 +145,7 @@ void CMDemonGuard::HandleAnimEvent(MonsterEvent_t *pEvent)
 		break;
 		case GUARD_ATTACK_LEFT:
 		{
-			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(200, 250), DMG_SLASH);
+			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_LONG(190, 230), DMG_SLASH);
 			if (pHurt)
 			{
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -163,7 +163,7 @@ void CMDemonGuard::HandleAnimEvent(MonsterEvent_t *pEvent)
 		break;
 		case GUARD_STOMP:
 		{
-			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(200, 250), DMG_SLASH);
+			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_LONG(200, 250), DMG_SLASH);
 			if (pHurt)
 			{
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))

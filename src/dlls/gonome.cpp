@@ -134,14 +134,14 @@ void CGonomeGuts :: GutsTouch( edict_t *pOther )
 	else
 	{
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(120, 130), DMG_GENERIC );
+			UTIL_TakeDamage( pOther, pev, VARS(pev->owner), 40.0, DMG_GENERIC );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage ( pev, VARS(pev->owner), RANDOM_FLOAT(120, 130), DMG_GENERIC );
+			pMonster->TakeDamage ( pev, VARS(pev->owner), 40.0, DMG_GENERIC );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(120, 130), DMG_GENERIC );
+			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), 40.0, DMG_GENERIC );
 	}
 	
 	SetThink( &CGonomeGuts::SUB_Remove );
@@ -483,7 +483,7 @@ void CMGonome::HandleAnimEvent(MonsterEvent_t *pEvent)
 
 	case GONOME_AE_SLASH_LEFT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_FLOAT(38, 45), DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_LONG(75, 80), DMG_SLASH);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -503,7 +503,7 @@ void CMGonome::HandleAnimEvent(MonsterEvent_t *pEvent)
 
 	case GONOME_AE_SLASH_RIGHT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_FLOAT(38, 45), DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_LONG(75, 80), DMG_SLASH);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -527,7 +527,7 @@ void CMGonome::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case GONOME_AE_BITE4:
 		{
 			int iPitch;
-			edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_FLOAT(25, 35), DMG_SLASH);
+			edict_t *pHurt = CheckTraceHullAttack(GONOME_MELEE_ATTACK_RADIUS, RANDOM_LONG(75, 80), DMG_SLASH);
 
 			if (pHurt)
 			{

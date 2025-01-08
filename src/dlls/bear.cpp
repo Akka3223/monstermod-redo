@@ -128,7 +128,7 @@ void CMBear::HandleAnimEvent(MonsterEvent_t *pEvent)
 	{
 		case BEAR_ATTACK_RIGHT:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 100, RANDOM_FLOAT(70, 80), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 100, RANDOM_FLOAT(26, 28), DMG_SLASH );
 			if( pHurt )
 			{
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -145,7 +145,7 @@ void CMBear::HandleAnimEvent(MonsterEvent_t *pEvent)
 		break;
 		case BEAR_ATTACK_BITE:
 		{
-			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(70, 80), DMG_SLASH);
+			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(26, 28), DMG_SLASH);
 			if (pHurt)
 			{
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
@@ -162,7 +162,7 @@ void CMBear::HandleAnimEvent(MonsterEvent_t *pEvent)
 		break;
 		case BEAR_ATTACK_MAUL:
 		{
-			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(100, 110), DMG_SLASH);
+			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(26, 28), DMG_SLASH);
 			if (pHurt)
 			{
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))

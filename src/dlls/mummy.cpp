@@ -171,7 +171,7 @@ void CMMummy :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case MUMMY_ATTACK:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(150.0, 170.0), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(168, 200), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )

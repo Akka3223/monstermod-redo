@@ -1179,14 +1179,14 @@ void CMControllerHeadBall :: HuntThink( void  )
 			ClearMultiDamage( );
 
 			if (UTIL_IsPlayer(tr.pHit))
-				UTIL_TraceAttack( tr.pHit, VARS(m_hOwner), RANDOM_FLOAT(38, 45), pev->velocity, &tr, DMG_SHOCK );
+				UTIL_TraceAttack( tr.pHit, VARS(m_hOwner), RANDOM_FLOAT(38.0, 45.0), pev->velocity, &tr, DMG_SHOCK );
 			else if (tr.pHit->v.euser4 != NULL)
 			{
 				CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(tr.pHit));
-				pMonster->TraceAttack( VARS(m_hOwner), RANDOM_FLOAT(38, 45), pev->velocity, &tr, DMG_SHOCK );
+				pMonster->TraceAttack( VARS(m_hOwner), RANDOM_FLOAT(38.0, 45.0), pev->velocity, &tr, DMG_SHOCK );
 			}
 			else
-				UTIL_TraceAttack( tr.pHit, VARS(m_hOwner), RANDOM_FLOAT(38, 45), pev->velocity, &tr, DMG_SHOCK );
+				UTIL_TraceAttack( tr.pHit, VARS(m_hOwner), RANDOM_FLOAT(38.0, 45.0), pev->velocity, &tr, DMG_SHOCK );
 
 			ApplyMultiDamage( pev, VARS(m_hOwner) );
 		}
@@ -1357,14 +1357,14 @@ void CMControllerZapBall::ExplodeTouch( edict_t *pOther )
 
 		ClearMultiDamage( );
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TraceAttack(pOther, pevOwner, RANDOM_FLOAT(15, 25), pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM ); 
+			UTIL_TraceAttack(pOther, pevOwner, RANDOM_FLOAT(27.0, 30.0), pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM ); 
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TraceAttack(pevOwner, RANDOM_FLOAT(15, 25), pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM ); 
+			pMonster->TraceAttack(pevOwner, RANDOM_FLOAT(27.0, 30.0), pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM ); 
 		}
 		else
-			UTIL_TraceAttack(pOther, pevOwner, RANDOM_FLOAT(15, 25), pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM );
+			UTIL_TraceAttack(pOther, pevOwner, RANDOM_FLOAT(27.0, 30.0), pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM );
 		ApplyMultiDamage( pevOwner, pevOwner );
 
 		UTIL_EmitAmbientSound( ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.3, ATTN_NORM, 0, RANDOM_LONG( 90, 99 ) );

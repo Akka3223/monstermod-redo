@@ -394,7 +394,7 @@ void CMPitdrone::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case PIT_DRONE_AE_THROW:
 	{
 		// SOUND HERE (in the pitdrone model)
-		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(12, 14), DMG_SLASH );
+		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(9, 12), DMG_SLASH );
 
 		if( pHurt )
 		{
@@ -427,7 +427,7 @@ void CMPitdrone::HandleAnimEvent(MonsterEvent_t *pEvent)
 		 * Pitdrone always starts the attack with the right claw so we use shouldAttackWithLeftClaw to check which claw is used now.
 		 */
 		// SOUND HERE (in the pitdrone model)
-		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_FLOAT(12, 14), DMG_SLASH);
+		edict_t *pHurt = CheckTraceHullAttack(70, RANDOM_LONG(9, 12), DMG_SLASH);
 		if (pHurt)
 		{
 			if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))

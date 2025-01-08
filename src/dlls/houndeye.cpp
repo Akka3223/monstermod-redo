@@ -533,7 +533,7 @@ void CMHoundeye :: SonicAttack ( void )
 				// Calculate full damage first
 
 				// solo
-				flAdjustedDamage = RANDOM_FLOAT(16, 19);
+				flAdjustedDamage = RANDOM_FLOAT(9, 12);
 
 				flDist = (pEntity->v.origin - pev->origin).Length();
 

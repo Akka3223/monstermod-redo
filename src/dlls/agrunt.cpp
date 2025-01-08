@@ -451,7 +451,7 @@ void CMAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 	case AGRUNT_AE_LEFT_PUNCH:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(200, 250), DMG_CLUB );
+			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(160, 200), DMG_CLUB );
 
 			if ( pHurt )
 			{
@@ -488,7 +488,7 @@ void CMAGrunt :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 	case AGRUNT_AE_RIGHT_PUNCH:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(200, 250), DMG_CLUB );
+			edict_t *pHurt = CheckTraceHullAttack( AGRUNT_MELEE_DIST, RANDOM_FLOAT(160, 200), DMG_CLUB );
 
 			if ( pHurt )
 			{

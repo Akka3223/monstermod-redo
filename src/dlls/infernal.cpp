@@ -172,7 +172,7 @@ void CMInfernal :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case INFERNAL_ATT:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 170, 350.0, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 170, RANDOM_LONG(350, 400), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -193,7 +193,7 @@ void CMInfernal :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case INFERNAL_ATT2:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 170, 350.0, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 170, RANDOM_LONG(350, 400), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )

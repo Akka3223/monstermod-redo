@@ -121,14 +121,14 @@ void CMVoltigoreEnergyBall::BallTouch(edict_t *pOther)
 	else
 	{
 		if ( UTIL_IsPlayer( pOther ) )
-			UTIL_TakeDamage( pOther, pev, VARS( pev->owner ), RANDOM_FLOAT(140, 220), DMG_SHOCK|DMG_ALWAYSGIB );
+			UTIL_TakeDamage( pOther, pev, VARS( pev->owner ), 300.0, DMG_SHOCK|DMG_ALWAYSGIB );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage( pev, VARS( pev->owner ), RANDOM_FLOAT(140, 220), DMG_SHOCK|DMG_ALWAYSGIB );
+			pMonster->TakeDamage( pev, VARS( pev->owner ), 300.0, DMG_SHOCK|DMG_ALWAYSGIB );
 		}
 		else
-			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), RANDOM_FLOAT(140, 220), DMG_SHOCK | DMG_ALWAYSGIB );
+			UTIL_TakeDamageExternal( pOther, pev, VARS(pev->owner), 300.0, DMG_SHOCK | DMG_ALWAYSGIB );
 	}
 	pev->velocity = Vector(0,0,0);
 
@@ -993,8 +993,8 @@ void CMVoltigore::GibBeamDamage()
 {
 	edict_t *pEntity = NULL;
 	// iterate on all entities in the vicinity.
-	const float attackRadius = RANDOM_FLOAT(70, 110) * 10;
-	float flAdjustedDamage = RANDOM_FLOAT(70, 110)/2;
+	const float attackRadius = 300.0 * 10.0;
+	float flAdjustedDamage = 300.0 / 2.0;
 	while( ( pEntity = UTIL_FindEntityInSphere( pEntity, pev->origin, attackRadius ) ) != NULL )
 	{
 		if( pEntity->v.takedamage != DAMAGE_NO )

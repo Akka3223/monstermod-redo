@@ -518,7 +518,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case BSQUID_AE_BITE:
 		{
 			// SOUND HERE!
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(70,75), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(24, 26), DMG_SLASH );
 			
 			if ( pHurt )
 			{
@@ -532,7 +532,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 		case BSQUID_AE_TAILWHIP:
 		{
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(90,110), DMG_CLUB | DMG_ALWAYSGIB );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(24, 26), DMG_CLUB | DMG_ALWAYSGIB );
 			if ( pHurt ) 
 			{
 				pHurt->v.punchangle.z = -20;

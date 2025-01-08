@@ -148,7 +148,7 @@ void CMFelHound :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case HOUND_ATTACK:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(70, 80), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(9, 12), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )

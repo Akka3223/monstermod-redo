@@ -132,7 +132,7 @@ void CMShaleSpider::HandleAnimEvent(MonsterEvent_t *pEvent)
 	{
 	case SPIDER_ATTACK_RIGHT:
 	{
-		edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(8, 9), DMG_SLASH );
+		edict_t *pHurt = CheckTraceHullAttack( 70, 4, DMG_SLASH );
 		if( pHurt )
 		{
 			if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))

@@ -159,7 +159,7 @@ void CMZombie :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		{
 			// do stuff for this event.
 	//		ALERT( at_console, "Slash right!\n" );
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.zombieDmgOneSlash, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(75, 84), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -183,7 +183,7 @@ void CMZombie :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		{
 			// do stuff for this event.
 	//		ALERT( at_console, "Slash left!\n" );
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.zombieDmgOneSlash, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(75, 84), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -205,7 +205,7 @@ void CMZombie :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		case ZOMBIE_AE_ATTACK_BOTH:
 		{
 			// do stuff for this event.
-			edict_t *pHurt = CheckTraceHullAttack( 70, gSkillData.zombieDmgBothSlash, DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(168, 200), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )

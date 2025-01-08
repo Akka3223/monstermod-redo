@@ -328,11 +328,11 @@ void CMHeadCrab :: LeapTouch ( edict_t *pOther )
 		EMIT_SOUND_DYN( edict(), CHAN_WEAPON, RANDOM_SOUND_ARRAY(pBiteSounds), GetSoundVolume(), ATTN_IDLE, 0, GetVoicePitch() );
 
 		if (UTIL_IsPlayer(pOther))
-			UTIL_TakeDamage( pOther, pev, pev, RANDOM_FLOAT(4.0, 5.0), DMG_SLASH );
+			UTIL_TakeDamage( pOther, pev, pev, 4, DMG_SLASH );
 		else if (pOther->v.euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pOther));
-			pMonster->TakeDamage( pev, pev, RANDOM_FLOAT(4.0, 5.0), DMG_SLASH );
+			pMonster->TakeDamage( pev, pev, 4, DMG_SLASH );
 		}
 	}
 

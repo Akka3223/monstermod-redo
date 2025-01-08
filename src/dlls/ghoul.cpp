@@ -158,7 +158,7 @@ void CMGhoul :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		{
 			// do stuff for this event.
 			ALERT( at_console, "Slash right!\n" );
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(70, 80), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(26, 28), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
@@ -182,7 +182,7 @@ void CMGhoul :: HandleAnimEvent( MonsterEvent_t *pEvent )
 		{
 			// do stuff for this event.
 			ALERT( at_console, "Slash left!\n" );
-			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_FLOAT(70, 80), DMG_SLASH );
+			edict_t *pHurt = CheckTraceHullAttack( 70, RANDOM_LONG(26, 28), DMG_SLASH );
 			if ( pHurt )
 			{
 				if ( pHurt->v.flags & (FL_MONSTER|FL_CLIENT) )
