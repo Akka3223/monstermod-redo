@@ -177,6 +177,7 @@ monster_type_t monster_types[]=
 	"monster_mummy", FALSE,
 	"monster_revenant", FALSE,
 	"monster_infernal", FALSE,
+	"monster_ankhet", FALSE,
 	"", FALSE
 };
 monster_t monsters[MAX_MONSTER_ENTS];
@@ -735,6 +736,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		case 42: monsters[monster_index].pMonster = CreateClassPtr((CMMummy *)NULL); break;
 		case 43: monsters[monster_index].pMonster = CreateClassPtr((CMRevenant *)NULL); break;
 		case 44: monsters[monster_index].pMonster = CreateClassPtr((CMInfernal *)NULL); break;
+		case 45: monsters[monster_index].pMonster = CreateClassPtr((CMAnkhet *)NULL); break;
 		default: LOG_MESSAGE(PLID, "ERROR: Invalid monster type! (%i)", monster_type); return NULL;
 	}
 
@@ -1505,6 +1507,8 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	CMMummy mummy; // 42
 	CMRevenant revenant; // 43
 	CMInfernal infernal; // 44
+	CMAnkhet ankhet; // 45
+	
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 
 	(g_engfuncs.pfnAddServerCommand)("monster", MonsterCommand);
@@ -1565,6 +1569,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 				case 42: mummy.Precache(); break;
 				case 43: revenant.Precache(); break;
 				case 44: infernal.Precache(); break;
+				case 45: ankhet.Precache(); break;
 			}
 		}
 	}
