@@ -464,7 +464,7 @@ void scan_monster_cfg(FILE *fp)
 												if(rand == 1) {
 													m_d2category_monster[5] = 0;
 												} else if(rand == 2) {
-													m_d2category_monster[5] = 43; // REVENANT MISSING
+													m_d2category_monster[5] = 43;
 												} else if(rand == 3) {
 													m_d2category_monster[5] = 39;
 												}
@@ -486,7 +486,7 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 2) {
 													m_d2category_monster[7] = 42;
 												} else if(rand == 3) {
-													m_d2category_monster[7] = 13; // MISSING ADDITIONAL MOB
+													m_d2category_monster[7] = 45;
 												}
 											}
 										}
