@@ -25,9 +25,9 @@
 #endif
 
 const float Tier1_HP = 100.0;
-const float Tier2_HP = 300.0;
-const float Tier3_HP = 1000.0;
-const float Tier4_HP = 1800.0;
+const float Tier2_HP = 250.0;
+const float Tier3_HP = 850.0;
+const float Tier4_HP = 1700.0;
 const float Tier5_HP = 3200.0;
 const float Tier6_HP = 12000.0;
 const float Tier7_HP = 850.0;
