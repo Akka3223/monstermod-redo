@@ -26,10 +26,10 @@
 
 const float Tier1_HP = 100.0;
 const float Tier2_HP = 250.0;
-const float Tier3_HP = 850.0;
-const float Tier4_HP = 1700.0;
-const float Tier5_HP = 3200.0;
-const float Tier6_HP = 12000.0;
+const float Tier3_HP = 750.0;
+const float Tier4_HP = 1250.0;
+const float Tier5_HP = 2200.0;
+const float Tier6_HP = 5500.0;
 const float Tier7_HP = 850.0;
 /* MONSTER	HEALTH	DROP RANGE	EXP	GOLD
 Head Crab	75		160-200	11-21	6-16+

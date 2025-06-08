@@ -298,7 +298,7 @@ BOOL CMBullsquid :: CheckRangeAttack1 ( float flDot, float flDist )
 		else
 		{
 			// not moving, so spit again pretty soon.
-			m_flNextSpitTime = gpGlobals->time + 0.5;
+			m_flNextSpitTime = gpGlobals->time + 1.0;
 		}
 
 		return TRUE;
@@ -527,6 +527,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				pHurt->v.velocity = pHurt->v.velocity - gpGlobals->v_forward * 100;
 				pHurt->v.velocity = pHurt->v.velocity + gpGlobals->v_up * 100;
 			}
+			m_flNextAttack = gpGlobals->time + 1;
 		}
 		break;
 
@@ -540,6 +541,7 @@ void CMBullsquid :: HandleAnimEvent( MonsterEvent_t *pEvent )
 				pHurt->v.velocity = pHurt->v.velocity + gpGlobals->v_right * 200;
 				pHurt->v.velocity = pHurt->v.velocity + gpGlobals->v_up * 100;
 			}
+			m_flNextAttack = gpGlobals->time + 1;
 		}
 		break;
 

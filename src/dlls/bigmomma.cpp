@@ -1208,7 +1208,7 @@ void CMBMortar::Touch( edict_t *pOther )
 	if ( pev->owner )
 		pevOwner = VARS(pev->owner);
 
-	RadiusDamage( pev->origin, pev, pevOwner, 300.0, 400.0/*radius*/, CLASS_NONE, DMG_ACID );
+	RadiusDamage( pev->origin, pev, pevOwner, RANDOM_LONG(150, 250), 400.0/*radius*/, CLASS_NONE, DMG_ACID );
 	UTIL_Remove( this->edict() );
 }
 

@@ -524,6 +524,7 @@ void CMBaseMonster::BecomeDead( void )
 	
 	// give the corpse half of the monster's original maximum health. 
 	pev->health = pev->max_health / 2;
+	pev->fuser3 = pev->max_health;
 	pev->max_health = 5; // max_health now becomes a counter for how many blood decals the corpse can place.
 
 	// make the corpse fly away from the attack vector
