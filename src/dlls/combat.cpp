@@ -334,6 +334,7 @@ void CMBaseMonster :: GibMonster( void )
 		if ( gibbed )
 		{
 			// don't remove players!
+			ALERT( at_aiconsole, "PRE SUB_Remove HERE\n");
 			SetThink ( &CMBaseMonster::SUB_Remove );
 			pev->nextthink = gpGlobals->time;
 		}
@@ -462,6 +463,7 @@ Activity CMBaseMonster :: GetDeathActivity ( void )
 			}
 	}
 
+	// deathActivity = ACT_DIESIMPLE;// in case we can't find any special deaths to do.
 	return deathActivity;
 }
 
@@ -604,8 +606,18 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	
 	if ( HasMemory( bits_MEMORY_KILLED ) )
 	{
+		// 
+		ALERT( at_aiconsole, "During bits_MEMORY_KILLED\n");
 		if ( ShouldGibMonster( iGib ) )
+		{
 			CallGibMonster();
+		}
+		else
+		{
+			pev->effects = EF_NODRAW;
+			SetThink ( &CMBaseMonster::SUB_Remove );
+			pev->nextthink = gpGlobals->time;
+		}
 		return;
 	}
 
@@ -619,7 +631,7 @@ void CMBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	
 	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
 	CMBaseEntity *pOwner = CMBaseEntity::Instance(pev->owner);
-	if ( pOwner )
+	if ( pOwner && pev )
 	{
 		pOwner->DeathNotice( pev );  
 	}
@@ -835,6 +847,9 @@ int CMBaseMonster :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker
 	if (!pev->takedamage)
 		return 0;
 
+	/* if(pevAttacker->flags & FL_MONSTER)
+		return 0; */
+
 	if ( !IsAlive() )
 	{
 		return DeadTakeDamage( pevInflictor, pevAttacker, flDamage, bitsDamageType );
@@ -1002,19 +1017,19 @@ int CMBaseMonster :: DeadTakeDamage( entvars_t *pevInflictor, entvars_t *pevAtta
 #endif
 
 	// kill the corpse if enough damage was done to destroy the corpse and the damage is of a type that is allowed to destroy the corpse.
-	if ( bitsDamageType & DMG_GIB_CORPSE )
-	{
+	// if ( bitsDamageType & DMG_GIB_CORPSE )
+	// {
 		if ( pev->health <= flDamage )
 		{
 			pev->health = -50;
 			pev->fuser4 = pev->health;
-			Killed( pevAttacker, GIB_ALWAYS );
+			Killed( pevAttacker, GIB_NEVER );
 			return 0;
 		}
 		// Accumulate corpse gibbing damage, so you can gib with multiple hits
 		pev->health -= flDamage * 0.1;
 		pev->fuser4 = pev->health;
-	}
+	// }
 	
 	return 1;
 }
