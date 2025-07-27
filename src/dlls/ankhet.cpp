@@ -204,7 +204,7 @@ void CMAnkhet :: Spawn()
 {
 	Precache( );
 	
-	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/anotherway/mobs/ankhet.mdl"));
+	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/anotherway/mobs/ankhetx.mdl"));
 	UTIL_SetSize( pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
 	pev->solid			= SOLID_SLIDEBOX;
@@ -231,7 +231,7 @@ void CMAnkhet :: Spawn()
 //=========================================================
 void CMAnkhet :: Precache()
 {
-	PRECACHE_MODEL("models/anotherway/mobs/ankhet.mdl");
+	PRECACHE_MODEL("models/anotherway/mobs/ankhetx.mdl");
 
 	PRECACHE_SOUND_ARRAY(pAttackHitSounds);
 	PRECACHE_SOUND_ARRAY(pAttackMissSounds);
