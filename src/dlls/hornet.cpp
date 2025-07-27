@@ -79,7 +79,7 @@ void CMHornet :: Spawn( void )
 		pSoundEnt = edict();
 
 	// no real owner, or owner isn't a client. 
-	pev->dmg = RANDOM_FLOAT(15, 25);
+	pev->dmg = RANDOM_LONG(15, 25);
 	
 	pev->nextthink = gpGlobals->time + 0.1;
 	ResetSequenceInfo( );
@@ -376,4 +376,3 @@ void CMHornet::DieTouch ( edict_t *pOther )
 	SetThink ( &CMHornet::SUB_Remove );
 	pev->nextthink = gpGlobals->time + 1;// stick around long enough for the sound to finish!
 }
-
