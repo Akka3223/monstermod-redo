@@ -326,7 +326,14 @@ void check_monster_hurt(edict_t *pAttacker)
 						pent->v.health = pent->v.fuser4;
 
 						ClearMultiDamage( );
-						monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET | DMG_GIB_CORPSE );
+						if (strncmp( STRING( pent->v.classname ), "monster_", 8 ) == 0 && pent->v.flags & FL_MONSTER)
+						{
+							monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_GIB_CORPSE );
+						}
+						else
+						{
+							monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB);
+						}
 						ApplyMultiDamage( VARS(pAttacker), VARS(pAttacker) );
 					}
 
@@ -778,7 +785,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	SERVER_COMMAND( extCmd );
 	
 	// Only modify starting spawnflags for monsters, not for entities!
-	if ( monster_index <= 29 )
+/* 	if ( monster_index <= 29 || monster_index >= 35)
 	{
 		// Reverse fadecorpse behaviour
 		if ( ( spawnflags & SF_MONSTER_FADECORPSE ) )
@@ -786,7 +793,7 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 		else
 			monster_pent->v.spawnflags |= SF_MONSTER_FADECORPSE;
 	}
-
+ */
 	monster_pent->v.fuser4 = monster_pent->v.health;	 // save the original health
 
 	return monster_pent;
@@ -1383,8 +1390,11 @@ void mmDispatchThink( edict_t *pent )
 	{
 		if (pent == monsters[index].monster_pent)
 		{
-			monsters[index].pMonster->Think();
-
+			if (pent )
+			{
+				monsters[index].pMonster->Think();
+			}
+			
 			check_monster_dead(pent);
 
 			RETURN_META(MRES_SUPERCEDE);
@@ -1462,52 +1472,54 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	int index;
 	
 	// Monsters
-	CMAGrunt agrunt; // 0
-	CMApache apache;
-	CMBarney barney;
-	CMBigMomma bigmomma;
-	CMBullsquid bullsquid;
-	CMController controller;
-	CMHAssassin hassassin;
-	CMHeadCrab headcrab;
-	CMHGrunt hgrunt;
-	CMHoundeye houndeye;
-	CMISlave islave;
-	CMScientist scientist;
-	CMSqueakGrenade snark;
-	CMZombie zombie;
-	CMGargantua gargantua;
-	CMTurret turret;
-	CMMiniTurret miniturret;
-	CMSentry sentry;
-	CMGonome gonome;
-	CMMassn massn;
-	CMOtis otis;
-	CMPitdrone pitdrone;
-	CMShockRoach shockroach;
-	CMStrooper strooper;
-	CMVoltigore voltigore;
-	CMBabyVoltigore babyvoltigore;
-	CMBabyGargantua babygargantua;
-	CMHWGrunt hwgrunt;
-	CMRGrunt rgrunt;
-	CMStukabat stukabat; // 29
-	
-	// Extra entities
-	CMMonsterMaker monstermaker; // 32
-	CMAmbientMusic ambientmusic;
+	CMAGrunt agrunt;           // 0  "monster_alien_grunt"
+	CMApache apache;           // 1  "monster_apache"
+	CMBarney barney;           // 2  "monster_barney"
+	CMBigMomma bigmomma;       // 3  "monster_bigmomma"
+	CMBullsquid bullsquid;     // 4  "monster_bullsquid"
+	CMController controller;   // 5  "monster_alien_controller"
+	CMHAssassin hassassin;     // 6  "monster_human_assassin"
+	CMHeadCrab headcrab;       // 7  "monster_headcrab"
+	CMHGrunt hgrunt;           // 8  "monster_human_grunt"
+	CMHoundeye houndeye;       // 9  "monster_houndeye"
+	CMISlave islave;           //10  "monster_alien_slave"
+	CMScientist scientist;     //11  "monster_scientist"
+	CMSqueakGrenade snark;     //12  "monster_snark"
+	CMZombie zombie;           //13  "monster_zombie"
+	CMGargantua gargantua;     //14  "monster_gargantua"
+	CMTurret turret;           //15  "monster_turret"
+	CMMiniTurret miniturret;   //16  "monster_miniturret"
+	CMSentry sentry;           //17  "monster_sentry"
+	CMGonome gonome;           //18  "monster_gonome"
+	CMMassn massn;             //19  "monster_male_assassin"
+	CMOtis otis;               //20  "monster_otis"
+	CMPitdrone pitdrone;       //21  "monster_pitdrone"
+	CMShockRoach shockroach;   //22  "monster_shockroach"
+	CMStrooper strooper;       //23  "monster_shocktrooper"
+	CMVoltigore voltigore;     //24  "monster_alien_voltigore"
+	CMBabyVoltigore babyvoltigore;     //25  "monster_alien_babyvoltigore"
+	CMBabyGargantua babygargantua;     //26  "monster_babygarg"
+	CMHWGrunt hwgrunt;         //27  "monster_hwgrunt"
+	CMRGrunt rgrunt;           //28  "monster_robogrunt"
+	CMStukabat stukabat;       //29  "monster_stukabat"
 
-	CMSnake snake; // 35
-	CMCrab crab; // 36
-	CMGhoul ghoul; // 37
-	CMBear bear; // 38
-	CMDemonGuard DemonGuard; // 39
-	CMFelHound Hound; // 40
-	CMShaleSpider Shalespider; // 41
-	CMMummy mummy; // 42
-	CMRevenant revenant; // 43
-	CMInfernal infernal; // 44
-	CMAnkhet ankhet; // 45
+	// 30
+	// 31
+	// Extra entities
+	CMMonsterMaker monstermaker;       //32  "monstermaker"
+	CMAmbientMusic ambientmusic;       //33  "ambient_music"
+	// 34
+	CMSnake snake;             //35  "monster_snake"
+	CMCrab crab;               //36  "monster_crab"
+	CMGhoul ghoul;             //37  "monster_ghoul"
+	CMBear bear;               //38  "monster_bear"
+	CMDemonGuard DemonGuard;   //39  "monster_demonguard"
+	CMFelHound Hound;          //40  "monster_hound"
+	CMShaleSpider Shalespider; //41  "monster_shalespider"
+	CMMummy mummy;             //42  "monster_mummy"
+	CMRevenant revenant;       //43  "monster_revenant"
+	CMInfernal infernal;       //44  "monster_infernal"
+	CMAnkhet ankhet;           //45  "monster_ankhet"
 	
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 
@@ -1776,16 +1788,19 @@ C_DLLEXPORT int GetEntityAPI2( DLL_FUNCTIONS *pFunctionTable, int *interfaceVers
 
 void mmDispatchThink_Post( edict_t *pent )
 {
-	/* check_monster_hurt(pent);
-	check_monster_dead(pent); */
+	if(pent)
+	{
+		check_monster_hurt(pent);
+		check_monster_dead(pent);
+	}
 	
 	RETURN_META(MRES_IGNORED);
 }
 
 void mmPlayerPostThink_Post( edict_t *pEntity )
 {
-	check_monster_hurt(pEntity);
-	check_monster_dead(pEntity);
+/* 	check_monster_hurt(pEntity);
+	check_monster_dead(pEntity); */
 	//check_player_dead(pEntity); // too early for damageBits
 	check_monster_info(pEntity);
 	
