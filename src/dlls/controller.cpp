@@ -812,6 +812,9 @@ void CMController :: RunAI( void )
 
 	for (int i = 0; i < 2; i++)
 	{
+		if (!m_pBall[i] || FNullEnt(m_pBall[i]->edict()))
+			continue; // skip invalid sprite
+
 		if (m_pBall[i] == NULL)
 		{
 			m_pBall[i] = CMSprite::SpriteCreate( "sprites/xspark4.spr", pev->origin, TRUE );
@@ -833,24 +836,38 @@ void CMController :: RunAI( void )
 
 		m_iBallCurrent[i] += (m_iBall[i] - m_iBallCurrent[i]) * t;
 
-		m_pBall[i]->SetBrightness( m_iBallCurrent[i] );
-
-		GetAttachment( i + 2, vecStart, angleGun );
-		UTIL_SetOrigin( m_pBall[i]->pev, vecStart );
+		if (m_pBall[i] && m_pBall[i]->pev && ENTINDEX(m_pBall[i]->edict()) > 0)
+		{
+			m_pBall[i]->pev->renderamt = m_iBallCurrent[i];
 		
-		MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
-			WRITE_BYTE( TE_ELIGHT );
-			WRITE_SHORT( entindex( ) + 0x1000 * (i + 3) );		// entity, attachment
-			WRITE_COORD( vecStart.x );		// origin
-			WRITE_COORD( vecStart.y );
-			WRITE_COORD( vecStart.z );
-			WRITE_COORD( m_iBallCurrent[i] / 8 );	// radius
-			WRITE_BYTE( 255 );	// R
-			WRITE_BYTE( 192 );	// G
-			WRITE_BYTE( 64 );	// B
-			WRITE_BYTE( 5 );	// life * 10
-			WRITE_COORD( 0 ); // decay
-		MESSAGE_END();
+			// if(!FNullEnt(ENT(i + 2)))
+			// 	GetAttachment( i + 2, vecStart, angleGun );
+			UTIL_SetOrigin( m_pBall[i]->pev, vecStart );
+		
+			MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
+				WRITE_BYTE( TE_ELIGHT );
+				WRITE_SHORT( entindex( ) + 0x1000 * (i + 3) );		// entity, attachment
+				WRITE_COORD( vecStart.x );		// origin
+				WRITE_COORD( vecStart.y );
+				WRITE_COORD( vecStart.z );
+				WRITE_COORD( m_iBallCurrent[i] / 8 );	// radius
+				WRITE_BYTE( 255 );	// R
+				WRITE_BYTE( 192 );	// G
+				WRITE_BYTE( 64 );	// B
+				WRITE_BYTE( 5 );	// life * 10
+				WRITE_COORD( 0 ); // decay
+			MESSAGE_END();
+		}
+	}
+
+	// properly clean up balls
+	for (int i = 0; i < 2; i++)
+	{
+		if (m_pBall[i])
+		{
+			UTIL_Remove(m_pBall[i]->edict());
+			m_pBall[i] = NULL;
+		}
 	}
 }
 
