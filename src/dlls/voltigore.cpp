@@ -437,24 +437,24 @@ void CMVoltigore::RunAI(void)
 	GlowUpdate();
 }
 
-void CMVoltigore::GibMonster()
-{
-	GibBeamDamage();
-	EMIT_SOUND( ENT( pev ), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM );
-	if( CVAR_GET_FLOAT( "violence_agibs" ) != 0 )	// Should never get here, but someone might call it directly
+	/* void CMVoltigore::GibMonster()
 	{
-		CMGib::SpawnRandomGibs( pev, VOLTIGORE_GIB_COUNT, "models/vgibs.mdl", 0 );	// Throw alien gibs
-	}
-	SetThink( &CMBaseEntity::SUB_Remove );
-	pev->nextthink = gpGlobals->time;
-}
+		GibBeamDamage();
+		EMIT_SOUND( ENT( pev ), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM );
+		if( CVAR_GET_FLOAT( "violence_agibs" ) != 0 )	// Should never get here, but someone might call it directly
+		{
+			CMGib::SpawnRandomGibs( pev, VOLTIGORE_GIB_COUNT, "models/vgibs.mdl", 0 );	// Throw alien gibs
+		}
+		SetThink( &CMBaseEntity::SUB_Remove );
+		pev->nextthink = gpGlobals->time;
+	} */
 
-void CMVoltigore::UpdateOnRemove()
+/* void CMVoltigore::UpdateOnRemove()
 {
 	CMBaseMonster::UpdateOnRemove();
 	DestroyBeams();
 	DestroyGlow();
-}
+} */
 
 //=========================================================
 // CheckMeleeAttack1 - voltigore is a big guy, so has a longer
@@ -462,7 +462,7 @@ void CMVoltigore::UpdateOnRemove()
 //=========================================================
 BOOL CMVoltigore::CheckMeleeAttack1(float flDot, float flDist)
 {
-	if (flDist <= 120 && flDot >= 0.7)
+	if (flDist <= 200 && flDot >= 0.7)
 	{
 		return TRUE;
 	}
@@ -568,7 +568,7 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case VOLTIGORE_AE_PUNCH_SINGLE:
 	{
 		// SOUND HERE!
-		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_LONG(150, 250), DMG_CLUB);
+		edict_t *pHurt = CheckTraceHullAttack(200, RANDOM_LONG(150, 250), DMG_CLUB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -595,7 +595,7 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 	case VOLTIGORE_AE_PUNCH_BOTH:
 	{
 		// SOUND HERE!
-		edict_t *pHurt = CheckTraceHullAttack(120, RANDOM_LONG(150, 250), DMG_CLUB);
+		edict_t *pHurt = CheckTraceHullAttack(200, RANDOM_LONG(150, 250), DMG_CLUB);
 		if (pHurt)
 		{
 			if (FBitSet(pHurt->v.flags, FL_MONSTER|FL_CLIENT))
@@ -616,14 +616,14 @@ void CMVoltigore::HandleAnimEvent(MonsterEvent_t *pEvent)
 			EMIT_SOUND(ENT(pev), CHAN_VOICE, RANDOM_SOUND_ARRAY(pMeleeMissSounds), RANDOM_FLOAT(0.8, 0.9), ATTN_NORM);
 		}
 	}
-	break;
+	break;/* 
 
 	case VOLTIGORE_AE_GIB:
 	{
 		pev->health = 0;
 		GibMonster();
 	}
-	break;
+	break; */
 
 	default:
 		CMBaseMonster::HandleAnimEvent(pEvent);
@@ -637,7 +637,7 @@ void CMVoltigore::Spawn()
 {
 	Precache();
 
-	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/voltigore.mdl"));
+	SET_MODEL(ENT(pev), (!FStringNull( pev->model ) ? STRING( pev->model ) : "models/voltigore_z.mdl"));
 	UTIL_SetSize(pev, Vector(-80, -80, 0), Vector(80, 80, 90));
 
 	pev->solid			= SOLID_SLIDEBOX;
@@ -675,7 +675,7 @@ void CMVoltigore::Spawn()
 //=========================================================
 void CMVoltigore::Precache()
 {
-	PrecacheImpl("models/voltigore.mdl");
+	PrecacheImpl("models/voltigore_z.mdl");
 	PRECACHE_MODEL("models/vgibs.mdl");
 }
 
@@ -943,7 +943,6 @@ void CMVoltigore::StartTask(Task_t *pTask)
 		break;
 	}
 }
-
 void CMVoltigore::Killed(entvars_t *pevAttacker, int iGib)
 {
 	DestroyBeams();
@@ -1079,7 +1078,7 @@ void CMVoltigore::UpdateBeams()
 
 	for (int i = 0; i < 3; i++)
 	{
-		if (!m_pBeam[i]) {
+		if (!m_pBeam[i] || !m_pBeam[i]->pev) {
 			continue;
 		}
 		GetAttachment(i, vecEnd, vecAngles);
@@ -1108,15 +1107,20 @@ void CMVoltigore::DestroyGlow()
 
 void CMVoltigore::GlowUpdate()
 {
-	if (m_pBeamGlow)
+	if (!m_pBeamGlow || !UTIL_IsValidEntity(m_pBeamGlow->edict()))
 	{
-		m_pBeamGlow->pev->renderamt = UTIL_Approach(m_glowBrightness, m_pBeamGlow->pev->renderamt, 100);
-		if (m_pBeamGlow->pev->renderamt == 0)
-			m_pBeamGlow->pev->effects |= EF_NODRAW;
-		else
-			m_pBeamGlow->pev->effects &= ~EF_NODRAW;
-		UTIL_SetOrigin(m_pBeamGlow->pev, pev->origin);
+		m_pBeamGlow = NULL;
+		return;
 	}
+	
+	m_pBeamGlow->pev->renderamt = UTIL_Approach(m_glowBrightness, m_pBeamGlow->pev->renderamt, 100);
+
+	if (m_pBeamGlow->pev->renderamt == 0)
+		m_pBeamGlow->pev->effects |= EF_NODRAW;
+	else
+		m_pBeamGlow->pev->effects &= ~EF_NODRAW;
+
+	UTIL_SetOrigin(m_pBeamGlow->pev, pev->origin);
 }
 
 void CMVoltigore::GlowOff(void)
