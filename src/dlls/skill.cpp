@@ -174,7 +174,7 @@ void monster_skill_init(void)
 	gSkillData.barneyHealth = 35.0f;
 	
 	// Big momma
-	gSkillData.bigmommaHealthFactor = 1.5f;
+	gSkillData.bigmommaHealthFactor = 36.6666666667f;
 	gSkillData.bigmommaDmgSlash = 60.0f;
 	gSkillData.bigmommaDmgBlast = 120.0f;
 	gSkillData.bigmommaRadiusBlast = 250.0f;
