@@ -107,18 +107,21 @@ CMBeam *CMBeam::BeamCreate( const char *pSpriteName, int width )
 
 void CMBeam::BeamInit( const char *pSpriteName, int width )
 {
-	pev->flags |= FL_CUSTOMENTITY;
-	SetColor( 255, 255, 255 );
-	SetBrightness( 255 );
-	SetNoise( 0 );
-	SetFrame( 0 );
-	SetScrollRate( 0 );
-	pev->model = MAKE_STRING( pSpriteName );
-	SetTexture( PRECACHE_MODELINDEX( (char *)pSpriteName ) );
-	SetWidth( width );
-	pev->skin = 0;
-	pev->sequence = 0;
-	pev->rendermode = 0;
+	if(pev)
+	{
+		pev->flags |= FL_CUSTOMENTITY;
+		SetColor( 255, 255, 255 );
+		SetBrightness( 255 );
+		SetNoise( 0 );
+		SetFrame( 0 );
+		SetScrollRate( 0 );
+		pev->model = MAKE_STRING( pSpriteName );
+		SetTexture( PRECACHE_MODELINDEX( (char *)pSpriteName ) );
+		SetWidth( width );
+		pev->skin = 0;
+		pev->sequence = 0;
+		pev->rendermode = 0;
+	}
 }
 
 
