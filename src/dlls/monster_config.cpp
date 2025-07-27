@@ -488,6 +488,7 @@ void scan_monster_cfg(FILE *fp)
 												} else if(rand == 3) {
 													m_d2category_monster[7] = 45;
 												}
+												m_d2category_monster[7] = 13;
 											}
 										}
 										int mIndex;
