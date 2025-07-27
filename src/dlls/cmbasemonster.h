@@ -423,7 +423,11 @@ public:
 	static const char *pPainSounds[];
 	static const char *pAttackHitSounds[];
 	static const char *pAttackMissSounds[];
-
+	void SetObjectCollisionBox( void )
+	{
+		pev->absmin = pev->origin + Vector( -80, -80, 0 );
+		pev->absmax = pev->origin + Vector( 80, 80, 214 );
+	}
 	// No range attacks
 	BOOL CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
 	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
@@ -456,6 +460,11 @@ public:
 	static const char *pAttackHitSounds[];
 	static const char *pAttackMissSounds[];
 
+	void SetObjectCollisionBox( void )
+	{
+		pev->absmin = pev->origin + Vector( -95, -95, 0 );
+		pev->absmax = pev->origin + Vector( 95, 95, 190 );
+	}
 	// No range attacks
 	BOOL CheckRangeAttack1 ( float flDot, float flDist ) { return FALSE; }
 	BOOL CheckRangeAttack2 ( float flDot, float flDist ) { return FALSE; }
@@ -1331,30 +1340,24 @@ class CMBigMomma : public CMBaseMonster
 public:
 	void Spawn( void );
 	void Precache( void );
-	void KeyValue( KeyValueData *pkvd );
-	void Activate( void );
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 
-	void		RunTask( Task_t *pTask );
-	void		StartTask( Task_t *pTask );
-	Schedule_t	*GetSchedule( void );
-	Schedule_t	*GetScheduleOfType( int Type );
+	// void		RunTask( Task_t *pTask );
+	// void		StartTask( Task_t *pTask );
+	// Schedule_t	*GetSchedule( void );
+	// Schedule_t	*GetScheduleOfType( int Type );
 	void		TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType );
 
-	void NodeStart( int iszNextNode );
-	void NodeReach( void );
-	BOOL ShouldGoToNode( void );
+	// void NodeStart( int iszNextNode );
+	// void NodeReach( void );
+	// BOOL ShouldGoToNode( void );
 
 	void SetYawSpeed( void );
 	int  Classify ( void );
 	void HandleAnimEvent( MonsterEvent_t *pEvent );
 	void LayHeadcrab( void );
+	void Killed( entvars_t *pevAttacker, int iGib );
 
-	int GetNodeSequence( void );
-	int GetNodePresequence( void );
-	float GetNodeDelay( void );
-	float GetNodeRange( void );
-	float GetNodeYaw( void );
 	float m_flNextAttack;
 
 	// Restart the crab count on each new level
@@ -1388,8 +1391,6 @@ public:
 	static const char *pAlertSounds[];
 	static const char *pPainSounds[];
 	static const char *pFootSounds[];
-
-	CUSTOM_SCHEDULES;
 
 private:
 	float	m_nodeTime;
@@ -1919,12 +1920,12 @@ public:
 	virtual BOOL CheckMeleeAttack1(float flDot, float flDist);
 	virtual BOOL CheckRangeAttack1(float flDot, float flDist);
 	virtual void RunAI(void);
-	virtual void GibMonster();
+	// virtual void GibMonster();
 	Schedule_t *GetSchedule(void);
 	Schedule_t *GetScheduleOfType(int Type);
 	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual void Killed(entvars_t *pevAttacker, int iGib);
-	void UpdateOnRemove();
+	// void UpdateOnRemove();
 
 	CUSTOM_SCHEDULES
 
@@ -1934,6 +1935,12 @@ public:
 	CMSprite* m_pBeamGlow;
 	int m_glowBrightness;
 
+	void SetObjectCollisionBox( void )
+	{
+		pev->absmin = pev->origin + Vector( -95, -95, 0 );
+		pev->absmax = pev->origin + Vector( 95, 95, 190 );
+	}
+	
 	static const char* pAlertSounds[];
 	static const char* pAttackMeleeSounds[];
 	static const char* pMeleeHitSounds[];
