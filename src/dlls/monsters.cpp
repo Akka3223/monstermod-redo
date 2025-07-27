@@ -265,9 +265,11 @@ void CMBaseMonster :: Look ( int iDistance )
 //=========================================================
 void CMBaseMonster :: MonsterThink ( void )
 {
+	edict_t* ed = ENT(pev);
+	if (!pev || !ed || ed->free || !UTIL_IsValidEntity(ed))
+		return;
+	
 	pev->nextthink = gpGlobals->time + 0.1;// keep monster thinking.
-
-
 	RunAI();
 
 	float flInterval = StudioFrameAdvance( ); // animate
@@ -2935,7 +2937,6 @@ void CMBaseMonster :: MonsterInitDead( void )
 	InitBoneControllers();
 
 	pev->solid			= SOLID_BBOX;
-	pev->movetype		= MOVETYPE_TOSS;// so he'll fall to ground
 
 	pev->frame = 0;
 	ResetSequenceInfo( );
