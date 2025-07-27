@@ -1051,7 +1051,11 @@ float UTIL_VecToYaw( const Vector &vec )
 
 void UTIL_SetOrigin( entvars_t *pev, const Vector &vecOrigin )
 {
-	SET_ORIGIN(ENT(pev), vecOrigin );
+	if(pev)
+	{
+		if(UTIL_IsValidEntity(ENT(pev)))
+			SET_ORIGIN(ENT(pev), vecOrigin );
+	}
 }
 
 void UTIL_ParticleEffect( const Vector &vecOrigin, const Vector &vecDirection, ULONG ulColor, ULONG ulCount )
