@@ -465,6 +465,14 @@ void CMBigMomma :: HandleAnimEvent( MonsterEvent_t *pEvent )
 			pev->velocity = (gpGlobals->v_forward * 200) + gpGlobals->v_up * 500;
 			break;
 
+		case BIG_AE_EARLY_TARGET:
+			{
+				edict_t *pTarget = m_hTargetEnt;
+				if ( pTarget && pTarget->v.message )
+					FireTargets( STRING(pTarget->v.message), this->edict(), this->edict(), USE_TOGGLE, 0 );
+				Remember( bits_MEMORY_FIRED_NODE );
+			}
+			break;
 		default:
 			CMBaseMonster::HandleAnimEvent( pEvent );
 			break;
@@ -494,11 +502,6 @@ void CMBigMomma :: TraceAttack( entvars_t *pevAttacker, float flDamage, Vector v
 	}
 
 	CMBaseMonster::TraceAttack( pevAttacker, flDamage, vecDir, ptr, bitsDamageType );
-}
-
-void CMBigMomma::Killed( entvars_t *pevAttacker, int iGib )
-{
-	CMBaseMonster::Killed( pevAttacker, iGib );
 }
 
 int CMBigMomma :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
@@ -649,7 +652,67 @@ void CMBigMomma :: Precache()
 	PRECACHE_SOUND( "bullchicken/bc_acid1.wav" );
 	PRECACHE_SOUND( "bullchicken/bc_spithit1.wav" );
 	PRECACHE_SOUND( "bullchicken/bc_spithit2.wav" );
-}	
+}		
+
+
+void CMBigMomma::Activate( void )
+{
+	if ( m_hTargetEnt == NULL )
+		Remember( bits_MEMORY_ADVANCE_NODE );	// Start 'er up
+}
+
+
+void CMBigMomma::NodeStart( int iszNextNode )
+{
+	pev->netname = iszNextNode;
+
+	edict_t *pTarget = NULL;
+
+	if ( pev->netname )
+	{
+		edict_t *pentTarget = FIND_ENTITY_BY_TARGETNAME ( NULL, STRING(pev->netname) );
+
+		if ( !FNullEnt(pentTarget) )
+			pTarget = pentTarget;
+	}
+
+
+	if ( !pTarget )
+	{
+		ALERT( at_aiconsole, "BM: Finished the path!!\n" );
+		Remember( bits_MEMORY_PATH_FINISHED );
+		return;
+	}
+	Remember( bits_MEMORY_ON_PATH );
+	m_hTargetEnt = pTarget;
+}
+
+
+void CMBigMomma::NodeReach( void )
+{
+	edict_t *pTarget = m_hTargetEnt;
+
+	Forget( bits_MEMORY_ADVANCE_NODE );
+
+	if ( !pTarget )
+		return;
+
+	if ( pTarget->v.health )
+		pev->max_health = pev->health = pTarget->v.health * gSkillData.bigmommaHealthFactor;
+
+	if ( !HasMemory( bits_MEMORY_FIRED_NODE ) )
+	{
+		if ( pTarget->v.message )
+			FireTargets( STRING(pTarget->v.message), this->edict(), this->edict(), USE_TOGGLE, 0 );
+	}
+	Forget( bits_MEMORY_FIRED_NODE );
+
+	pev->netname = pTarget->v.target;
+	if ( pTarget->v.health == 0 )
+		Remember( bits_MEMORY_ADVANCE_NODE );	// Move on if no health at this node
+}
+
+
 	// Slash
 BOOL CMBigMomma::CheckMeleeAttack1( float flDot, float flDist )
 {
@@ -691,6 +754,285 @@ BOOL CMBigMomma::CheckRangeAttack1( float flDot, float flDist )
 //=========================================================
 // AI Schedules Specific to this monster
 //=========================================================
+
+enum
+{
+	SCHED_BIG_NODE = LAST_COMMON_SCHEDULE + 1,
+	SCHED_NODE_FAIL,
+};
+
+enum
+{
+	TASK_MOVE_TO_NODE_RANGE = LAST_COMMON_TASK + 1,	// Move within node range
+	TASK_FIND_NODE,									// Find my next node
+	TASK_PLAY_NODE_PRESEQUENCE,						// Play node pre-script
+	TASK_PLAY_NODE_SEQUENCE,						// Play node script
+	TASK_PROCESS_NODE,								// Fire targets, etc.
+	TASK_WAIT_NODE,									// Wait at the node
+	TASK_NODE_DELAY,								// Delay walking toward node for a bit. You've failed to get there
+	TASK_NODE_YAW,									// Get the best facing direction for this node
+};
+
+
+Task_t	tlBigNode[] =
+{
+	{ TASK_SET_FAIL_SCHEDULE,	(float)SCHED_NODE_FAIL },
+	{ TASK_STOP_MOVING,			(float)0		},
+	{ TASK_FIND_NODE,			(float)0		},	// Find my next node
+	{ TASK_PLAY_NODE_PRESEQUENCE,(float)0		},	// Play the pre-approach sequence if any
+	{ TASK_MOVE_TO_NODE_RANGE,	(float)0		},	// Move within node range
+	{ TASK_STOP_MOVING,			(float)0		},
+	{ TASK_NODE_YAW,			(float)0		},
+	{ TASK_FACE_IDEAL,			(float)0		},
+	{ TASK_WAIT_NODE,			(float)0		},	// Wait for node delay
+	{ TASK_PLAY_NODE_SEQUENCE,	(float)0		},	// Play the sequence if one exists
+	{ TASK_PROCESS_NODE,		(float)0		},	// Fire targets, etc.
+	{ TASK_SET_ACTIVITY,		(float)ACT_IDLE	},
+};
+
+Schedule_t	slBigNode[] =
+{
+	{ 
+		tlBigNode,
+		ARRAYSIZE ( tlBigNode ), 
+		0,
+		0,
+		"Big Node"
+	},
+};
+
+
+Task_t	tlNodeFail[] =
+{
+	{ TASK_NODE_DELAY,			(float)10		},	// Try to do something else for 10 seconds
+	{ TASK_SET_ACTIVITY,		(float)ACT_IDLE	},
+};
+
+Schedule_t	slNodeFail[] =
+{
+	{ 
+		tlNodeFail,
+		ARRAYSIZE ( tlNodeFail ), 
+		0,
+		0,
+		"NodeFail"
+	},
+};
+
+DEFINE_CUSTOM_SCHEDULES( CMBigMomma )
+{
+	slBigNode,
+	slNodeFail,
+};
+
+IMPLEMENT_CUSTOM_SCHEDULES( CMBigMomma, CMBaseMonster );
+
+
+
+
+Schedule_t *CMBigMomma::GetScheduleOfType( int Type )
+{
+	switch( Type )
+	{
+		case SCHED_BIG_NODE:
+			return slBigNode;
+		break;
+
+		case SCHED_NODE_FAIL:
+			return slNodeFail;
+		break;
+	}
+
+	return CMBaseMonster::GetScheduleOfType( Type );
+}
+
+
+BOOL CMBigMomma::ShouldGoToNode( void )
+{
+	if ( HasMemory( bits_MEMORY_ADVANCE_NODE ) )
+	{
+		if ( m_nodeTime < gpGlobals->time )
+			return TRUE;
+	}
+	return FALSE;
+}
+
+
+
+Schedule_t *CMBigMomma::GetSchedule( void )
+{
+	if ( ShouldGoToNode() )
+	{
+		return GetScheduleOfType( SCHED_BIG_NODE );
+	}
+
+	return CMBaseMonster::GetSchedule();
+}
+
+
+void CMBigMomma::StartTask( Task_t *pTask )
+{
+	switch ( pTask->iTask )
+	{
+	case TASK_FIND_NODE:
+		{
+			edict_t *pTarget = m_hTargetEnt;
+			if ( !HasMemory( bits_MEMORY_ADVANCE_NODE ) )
+			{
+				if ( pTarget )
+					pev->netname = m_hTargetEnt->v.target;
+			}
+			NodeStart( pev->netname );
+			TaskComplete();
+			ALERT( at_aiconsole, "BM: Found node %s\n", STRING(pev->netname) );
+		}
+		break;
+
+	case TASK_NODE_DELAY:
+		m_nodeTime = gpGlobals->time + pTask->flData;
+		TaskComplete();
+		ALERT( at_aiconsole, "BM: FAIL! Delay %.2f\n", pTask->flData );
+		break;
+
+	case TASK_PROCESS_NODE:
+		ALERT( at_aiconsole, "BM: Reached node %s\n", STRING(pev->netname) );
+		NodeReach();
+		TaskComplete();
+		break;
+
+	case TASK_PLAY_NODE_PRESEQUENCE:
+	case TASK_PLAY_NODE_SEQUENCE:
+		{
+			int sequence;
+			if ( pTask->iTask == TASK_PLAY_NODE_SEQUENCE )
+				sequence = GetNodeSequence();
+			else
+				sequence = GetNodePresequence();
+
+			ALERT( at_aiconsole, "BM: Playing node sequence %s\n", STRING(sequence) );
+			if ( sequence )
+			{
+				sequence = LookupSequence( STRING( sequence ) );
+				if ( sequence != -1 )
+				{
+					pev->sequence = sequence;
+					pev->frame = 0;
+					ResetSequenceInfo( );
+					ALERT( at_aiconsole, "BM: Sequence %s\n", STRING(GetNodeSequence()) );
+					return;
+				}
+			}
+			TaskComplete();
+		}
+		break;
+
+	case TASK_NODE_YAW:
+		pev->ideal_yaw = GetNodeYaw();
+		TaskComplete();
+		break;
+
+	case TASK_WAIT_NODE:
+		m_flWait = gpGlobals->time + GetNodeDelay();
+		if ( m_hTargetEnt->v.spawnflags & SF_INFOBM_WAIT )
+			ALERT( at_aiconsole, "BM: Wait at node %s forever\n", STRING(pev->netname) );
+		else
+			ALERT( at_aiconsole, "BM: Wait at node %s for %.2f\n", STRING(pev->netname), GetNodeDelay() );
+		break;
+
+
+	case TASK_MOVE_TO_NODE_RANGE:
+		{
+			edict_t *pTarget = m_hTargetEnt;
+			if ( !pTarget )
+				TaskFail();
+			else
+			{
+				if ( (pTarget->v.origin - pev->origin).Length() < GetNodeRange() )
+					TaskComplete();
+				else
+				{
+					Activity act = ACT_WALK;
+					if ( pTarget->v.spawnflags & SF_INFOBM_RUN )
+						act = ACT_RUN;
+
+					m_vecMoveGoal = pTarget->v.origin;
+					if ( !MoveToTarget( act, 2 ) )
+					{
+						TaskFail();
+					}
+				}
+			}
+		}
+		ALERT( at_aiconsole, "BM: Moving to node %s\n", STRING(pev->netname) );
+
+		break;
+
+	case TASK_MELEE_ATTACK1:
+		// Play an attack sound here
+		EMIT_SOUND_DYN( ENT(pev), CHAN_VOICE, RANDOM_SOUND_ARRAY(pAttackSounds), 1.0, ATTN_NORM, 0, PITCH_NORM );
+		CMBaseMonster::StartTask( pTask );
+		break;
+
+	default: 
+		CMBaseMonster::StartTask( pTask );
+		break;
+	}
+}
+
+//=========================================================
+// RunTask
+//=========================================================
+void CMBigMomma::RunTask( Task_t *pTask )
+{
+	switch ( pTask->iTask )
+	{
+	case TASK_MOVE_TO_NODE_RANGE:
+		{
+			float distance;
+
+			if ( m_hTargetEnt == NULL )
+				TaskFail();
+			else
+			{
+				distance = ( m_vecMoveGoal - pev->origin ).Length2D();
+				// Set the appropriate activity based on an overlapping range
+				// overlap the range to prevent oscillation
+				if ( (distance < GetNodeRange()) || MovementIsComplete() )
+				{
+					ALERT( at_aiconsole, "BM: Reached node!\n" );
+					TaskComplete();
+					RouteClear();		// Stop moving
+				}
+			}
+		}
+
+		break;
+
+	case TASK_WAIT_NODE:
+		if ( m_hTargetEnt != NULL && (m_hTargetEnt->v.spawnflags & SF_INFOBM_WAIT) )
+			return;
+
+		if ( gpGlobals->time > m_flWaitFinished )
+			TaskComplete();
+		ALERT( at_aiconsole, "BM: The WAIT is over!\n" );
+		break;
+
+	case TASK_PLAY_NODE_PRESEQUENCE:
+	case TASK_PLAY_NODE_SEQUENCE:
+		if ( m_fSequenceFinished )
+		{
+			m_Activity = ACT_RESET;
+			TaskComplete();
+		}
+		break;
+
+	default:
+		CMBaseMonster::RunTask( pTask );
+		break;
+	}
+}
+
+
 
 Vector VecCheckSplatToss( entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, float maxHeight )
 {

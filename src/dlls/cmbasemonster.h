@@ -1334,31 +1334,35 @@ public:
 
 
 class CInfoBM;
-
 class CMBigMomma : public CMBaseMonster
 {
 public:
 	void Spawn( void );
 	void Precache( void );
+	void KeyValue( KeyValueData *pkvd );
+	void Activate( void );
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 
-	// void		RunTask( Task_t *pTask );
-	// void		StartTask( Task_t *pTask );
-	// Schedule_t	*GetSchedule( void );
-	// Schedule_t	*GetScheduleOfType( int Type );
+	void		RunTask( Task_t *pTask );
+	void		StartTask( Task_t *pTask );
+	Schedule_t	*GetSchedule( void );
+	Schedule_t	*GetScheduleOfType( int Type );
 	void		TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType );
 
-	// void NodeStart( int iszNextNode );
-	// void NodeReach( void );
-	// BOOL ShouldGoToNode( void );
+	void NodeStart( int iszNextNode );
+	void NodeReach( void );
+	BOOL ShouldGoToNode( void );
 
 	void SetYawSpeed( void );
 	int  Classify ( void );
 	void HandleAnimEvent( MonsterEvent_t *pEvent );
 	void LayHeadcrab( void );
-	void Killed( entvars_t *pevAttacker, int iGib );
 
-	float m_flNextAttack;
+	int GetNodeSequence( void );
+	int GetNodePresequence( void );
+	float GetNodeDelay( void );
+	float GetNodeRange( void );
+	float GetNodeYaw( void );
 
 	// Restart the crab count on each new level
 	void OverrideReset( void )
@@ -1391,6 +1395,8 @@ public:
 	static const char *pAlertSounds[];
 	static const char *pPainSounds[];
 	static const char *pFootSounds[];
+
+	CUSTOM_SCHEDULES;
 
 private:
 	float	m_nodeTime;

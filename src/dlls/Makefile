@@ -1,8 +1,8 @@
 CPP = g++
 BASEFLAGS = -Dstricmp=strcasecmp -Dstrcmpi=strcasecmp -m32 -fPIC -Wall -Werror
-OPTFLAGS = -O2
+# -O2
+OPTFLAGS = -O0 -g
 CPPFLAGS = ${BASEFLAGS} ${OPTFLAGS} -w -I. -I../engine -I../common -I../pm_shared -I../metamod
-
 OBJ = \
 	agrunt.o \
 	AI_BaseNPC_Schedule.o \
@@ -63,7 +63,15 @@ OBJ = \
 	zombie.o \
 	snake.o \
 	crab.o \
-	ghoul.o
+	ghoul.o \
+	bear.o \
+	demonguard.o \
+	felhound.o \
+	shalespider.o \
+	mummy.o \
+	revenant.o \
+	infernal.o \
+	ankhet.o
 
 monster_mm_i386.so: ${OBJ}
 	${CPP} -m32 -fPIC -shared -o $@ ${OBJ}
