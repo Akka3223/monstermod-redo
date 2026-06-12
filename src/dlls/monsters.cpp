@@ -174,6 +174,16 @@ void Monster_ProvokedByPlayer(edict_t *pMonsterEdict, edict_t *pPlayerEdict, flo
 }
 
 //=========================================================
+// CMBaseMonster constructor — zeroes sound-list fields
+// so the destructor doesn't free a garbage pointer.
+//=========================================================
+CMBaseMonster :: CMBaseMonster()
+{
+	m_srSoundList = NULL;
+	m_isrSounds = 0;
+}
+
+//=========================================================
 // ~CMBaseMonster — frees sound list if allocated.
 //=========================================================
 CMBaseMonster :: ~CMBaseMonster()

@@ -156,6 +156,7 @@ public:
 	float			GetEliteDmgMult( void ) const { return m_flEliteDmgMult; }
 
 	virtual			~CMBaseMonster();			// frees m_srSoundList
+	CMBaseMonster();							// zeroes m_srSoundList / m_isrSounds
 
 // Basic Monster AI functions
 	virtual float ChangeYaw ( int speed );

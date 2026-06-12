@@ -83,8 +83,11 @@ void scan_monster_sound(FILE *fp, edict_t *pMonster )
 		char *source = strtok(input, " \t");
 		char *destination = strtok(NULL, " \t");
 
+		if (!source || !destination)
+			continue;
+
 		// Remove all quotes
-		char parse[128] = {0};
+		char parse[1024] = {0};
 		int skip;
 
 		// source
@@ -99,7 +102,7 @@ void scan_monster_sound(FILE *fp, edict_t *pMonster )
 			parse[i-skip] = source[i];
 		}
 		parse[strlen(parse)] = '\0';
-		strcpy(source, parse);
+		snprintf(source, 1024, "%s", parse);
 
 		// destination
 		memset(parse, 0, sizeof(parse));
@@ -114,7 +117,7 @@ void scan_monster_sound(FILE *fp, edict_t *pMonster )
 			parse[i-skip] = destination[i];
 		}
 		parse[strlen(parse)] = '\0';
-		strcpy(destination, parse);
+		snprintf(destination, 1024, "%s", parse);
 
 		if ( pMonster )
 			REPLACER::AddIndividualSound( pMonster, source, destination );
@@ -162,7 +165,7 @@ void scan_monster_cfg(FILE *fp)
 		{
 			// Proper start, initialize entity creation
 			// Temporary variables to store entity data
-			pKVD *data = (pKVD*)malloc(MAX_KEYVALUES*sizeof(*data)); // Entities should not have more than this many keyvalues
+			pKVD *data = (pKVD*)calloc(MAX_KEYVALUES, sizeof(*data)); // Entities should not have more than this many keyvalues
 			int kvd_index = 0;
 			while (get_input(fp, input))
 			{
@@ -170,7 +173,7 @@ void scan_monster_cfg(FILE *fp)
 				if (input[0] == '}')
 				{
 					// Check if the classname of whatever we want to spawn is valid.
-					if (strcmp(data[kvd_index-1].key, "classname") == 0)
+					if (kvd_index > 0 && strcmp(data[kvd_index-1].key, "classname") == 0)
 					{
 						int mIndex;
 						for (mIndex = 0; monster_types[mIndex].name[0]; mIndex++)
@@ -266,8 +269,15 @@ void scan_monster_cfg(FILE *fp)
 					}
 					else
 					{
-						// What are you doing?!
-						LOG_MESSAGE(PLID, "ERROR: BAD ENTITY STRUCTURE! Last line was %s", data[kvd_index-1].key); // print conflictive line
+						if ( kvd_index > 0 )
+						{
+							// What are you doing?!
+							LOG_MESSAGE(PLID, "ERROR: BAD ENTITY STRUCTURE! Last line was %s", data[kvd_index-1].key); // print conflictive line
+						}
+						else
+						{
+							LOG_MESSAGE(PLID, "ERROR: BAD ENTITY STRUCTURE! No keyvalues found before '}'.");
+						}
 						LOG_MESSAGE(PLID, "ERROR: classname MUST be the last entry of the entity!" );
 						badent = TRUE;
 					}
@@ -541,8 +551,8 @@ void scan_monster_cfg(FILE *fp)
 										PRECACHE_GENERIC(data[i].value);
 
 										// the entity will need the keyvalue
-										strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
-										strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);
+										snprintf(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, sizeof(monster_spawnpoint[monster_spawn_count].keyvalue[i].key), "%s", data[i].key);
+										snprintf(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, sizeof(monster_spawnpoint[monster_spawn_count].keyvalue[i].value), "%s", data[i].value);
 									}
 								}
 							}
@@ -552,8 +562,8 @@ void scan_monster_cfg(FILE *fp)
 								// Save it for later
 								if (monster)
 								{
-									strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, data[i].key);
-									strcpy(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, data[i].value);
+									snprintf(monster_spawnpoint[monster_spawn_count].keyvalue[i].key, sizeof(monster_spawnpoint[monster_spawn_count].keyvalue[i].key), "%s", data[i].key);
+									snprintf(monster_spawnpoint[monster_spawn_count].keyvalue[i].value, sizeof(monster_spawnpoint[monster_spawn_count].keyvalue[i].value), "%s", data[i].value);
 								}
 							}
 						}
@@ -584,7 +594,7 @@ void scan_monster_cfg(FILE *fp)
 				}
 				
 				// Bruteforce to remove quotes
-				char parse[66] = {0};
+				char parse[1024] = {0};
 				int skip = 0;
 				for (unsigned i = 0; i < strlen(input); i++)
 				{
@@ -600,14 +610,16 @@ void scan_monster_cfg(FILE *fp)
 				// Copy all keyvalues to the tempvar
 				// Key
 				char *copy = strtok(parse, " ");
-				strcpy(data[kvd_index].key, copy);
+				snprintf(data[kvd_index].key, sizeof(data[kvd_index].key), "%s", copy ? copy : "");
 				
 				// Value
 				copy = strtok(NULL, " ");
-				strcpy(data[kvd_index].value, "");
+				data[kvd_index].value[0] = '\0';
 				while (copy != NULL)
 				{
 					// If the value is a vector, append necessary whitespaces
+					if (strlen(data[kvd_index].value) + strlen(copy) + 2 > sizeof(data[kvd_index].value))
+						break; // prevent overflow
 					strcat(data[kvd_index].value, copy);
 					copy = strtok(NULL, " ");
 					if (copy != NULL)
@@ -692,8 +704,8 @@ void scan_monster_bsp(void)
 				}
 			}
 			
-			strcpy(data[kvd_index].key, kv_pair->key);
-			strcpy(data[kvd_index].value, kv_pair->value);
+			snprintf(data[kvd_index].key, sizeof(data[kvd_index].key), "%s", kv_pair->key);
+			snprintf(data[kvd_index].value, sizeof(data[kvd_index].value), "%s", kv_pair->value);
 			
 			kvd_index++;
 			kv_pair = kv_pair->next;
@@ -1020,8 +1032,11 @@ void scan_monster_replace(FILE *fp, bool toGSR )
 		char *source = strtok(input, " \t");
 		char *destination = strtok(NULL, " \t");
 
+		if (!source || !destination)
+			continue;
+
 		// Remove all quotes
-		char parse[128] = {0};
+		char parse[1024] = {0};
 		int skip;
 
 		// source
@@ -1036,7 +1051,7 @@ void scan_monster_replace(FILE *fp, bool toGSR )
 			parse[i-skip] = source[i];
 		}
 		parse[strlen(parse)] = '\0';
-		strcpy(source, parse);
+		snprintf(source, 1024, "%s", parse);
 
 		// destination
 		memset(parse, 0, sizeof(parse));
@@ -1051,7 +1066,7 @@ void scan_monster_replace(FILE *fp, bool toGSR )
 			parse[i-skip] = destination[i];
 		}
 		parse[strlen(parse)] = '\0';
-		strcpy(destination, parse);
+		snprintf(destination, 1024, "%s", parse);
 
 		if ( toGSR )
 			REPLACER::AddGlobalSound( source, destination );

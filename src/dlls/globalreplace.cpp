@@ -41,8 +41,8 @@ bool AddGlobalModel(const char *from, const char *to)
 		if (!numModels)
 			GMR = (REPLACER*)calloc(MAX_REPLACEMENTS, sizeof(*GMR));
 		
-		strcpy(GMR[numModels].source, from);
-		strcpy(GMR[numModels].destination, to);
+		snprintf(GMR[numModels].source, sizeof(GMR[numModels].source), "%s", from);
+		snprintf(GMR[numModels].destination, sizeof(GMR[numModels].destination), "%s", to);
 
 		numModels++;
 		return true;
@@ -66,8 +66,8 @@ bool AddGlobalSound(const char *from, const char *to)
 		if (!numSounds)
 			GSR = (REPLACER*)calloc(MAX_REPLACEMENTS, sizeof(*GSR));
 		
-		strcpy(GSR[numSounds].source, from);
-		strcpy(GSR[numSounds].destination, to);
+		snprintf(GSR[numSounds].source, sizeof(GSR[numSounds].source), "%s", from);
+		snprintf(GSR[numSounds].destination, sizeof(GSR[numSounds].destination), "%s", to);
 
 		numSounds++;
 		return true;
@@ -92,8 +92,8 @@ bool AddIndividualSound(edict_t *pMonster, const char *from, const char *to)
 		if (!m_iSounds)
 			castMonster->m_srSoundList = (REPLACER*)calloc(MAX_REPLACEMENTS, sizeof(*castMonster->m_srSoundList));
 		
-		strcpy(castMonster->m_srSoundList[m_iSounds].source, from);
-		strcpy(castMonster->m_srSoundList[m_iSounds].destination, to);
+		snprintf(castMonster->m_srSoundList[m_iSounds].source, sizeof(castMonster->m_srSoundList[m_iSounds].source), "%s", from);
+		snprintf(castMonster->m_srSoundList[m_iSounds].destination, sizeof(castMonster->m_srSoundList[m_iSounds].destination), "%s", to);
 
 		castMonster->m_isrSounds++;
 		return true;
