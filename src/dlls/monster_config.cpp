@@ -571,7 +571,7 @@ void scan_monster_cfg(FILE *fp)
 						}
 						
 						// Log on? Print all the entities that were added
-						if (dllapi_log->value)
+						if (dllapi_log && dllapi_log->value)
 						{
 							// Classname only, or we will flood the server!
 							// No, I'm not making this idiotproof. Classname should be the last KVD entry on an entity!

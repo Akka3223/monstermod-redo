@@ -155,6 +155,8 @@ public:
 	int				GetEliteAffix( void ) const { return m_iEliteAffix; }
 	float			GetEliteDmgMult( void ) const { return m_flEliteDmgMult; }
 
+	virtual			~CMBaseMonster();			// frees m_srSoundList
+
 // Basic Monster AI functions
 	virtual float ChangeYaw ( int speed );
 	float VecToYaw( Vector vecDir );

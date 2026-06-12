@@ -174,6 +174,19 @@ void Monster_ProvokedByPlayer(edict_t *pMonsterEdict, edict_t *pPlayerEdict, flo
 }
 
 //=========================================================
+// ~CMBaseMonster — frees sound list if allocated.
+//=========================================================
+CMBaseMonster :: ~CMBaseMonster()
+{
+	if (m_srSoundList != NULL)
+	{
+		free(m_srSoundList);
+		m_srSoundList = NULL;
+	}
+	m_isrSounds = 0;
+}
+
+//=========================================================
 // EliteInit — called at the end of MonsterInit.
 // Rolls elite chance, assigns a random affix, applies
 // glow shell and stat modifiers.
