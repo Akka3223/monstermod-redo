@@ -1979,7 +1979,7 @@ void CMBaseMonster :: MonsterInit ( void )
 		m_hOldEnemy[ i ] = NULL;
 
 	if (!m_flDistLook)
-		m_flDistLook = monster_default_maxrange->value;
+		m_flDistLook = (monster_default_maxrange ? monster_default_maxrange->value : 2048.0f);
 	m_flDistTooFar = m_flDistLook / 2; // always 50%
 
 	// set eye position
@@ -2572,7 +2572,7 @@ float CMBaseMonster::ChangeYaw ( int yawSpeed )
 			delta = 0.25;
 		
 		// let server operators modify the multiplier coeficient -Giegue
-		float multiplier = monster_turn_coeficient->value;
+		float multiplier = monster_turn_coeficient ? monster_turn_coeficient->value : 1.75f;
 		if ( multiplier < 0.1 || multiplier > 10.0 )
 			multiplier = 1.75;
 

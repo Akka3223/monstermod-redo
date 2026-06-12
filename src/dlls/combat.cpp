@@ -1000,8 +1000,16 @@ int CMBaseMonster :: DeadTakeDamage( entvars_t *pevInflictor, entvars_t *pevAtta
 		if (pevInflictor->euser4 != NULL)
 		{
 			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pevInflictor));
-			vecDir = (pMonster->Center() - Vector(0, 0, 10) - Center()).Normalize();
-			vecDir = g_vecAttackDir = vecDir.Normalize();
+			if (pMonster != NULL)
+			{
+				vecDir = (pMonster->Center() - Vector(0, 0, 10) - Center()).Normalize();
+				vecDir = g_vecAttackDir = vecDir.Normalize();
+			}
+			else
+			{
+				vecDir = (UTIL_Center(ENT(pevInflictor)) - Vector(0, 0, 10) - Center()).Normalize();
+				vecDir = g_vecAttackDir = vecDir.Normalize();
+			}
 		}
 		else
 		{
@@ -1302,7 +1310,8 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 			else if (pEntity->v.euser4 != NULL)
 			{
 				CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
-				pMonster->TakeDamage( pev, pev, iDamage, iDmgType );
+				if (pMonster != NULL)
+					pMonster->TakeDamage( pev, pev, iDamage, iDmgType );
 			}
 			else
 				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType );

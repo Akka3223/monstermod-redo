@@ -536,13 +536,16 @@ void check_monster_hurt(edict_t *pAttacker)
 						pent->v.health = pent->v.fuser4;
 
 						ClearMultiDamage( );
-						if (strncmp( STRING( pent->v.classname ), "monster_", 8 ) == 0 && pent->v.flags & FL_MONSTER)
+						if (monsters[index].pMonster != NULL)
 						{
-							monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_GIB_CORPSE );
-						}
-						else
-						{
-							monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB);
+							if (strncmp( STRING( pent->v.classname ), "monster_", 8 ) == 0 && pent->v.flags & FL_MONSTER)
+							{
+								monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_GIB_CORPSE );
+							}
+							else
+							{
+								monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB);
+							}
 						}
 						ApplyMultiDamage( VARS(pDamageSource), VARS(pDamageSource) );
 					}
@@ -581,7 +584,8 @@ void check_monster_dead(edict_t *pAttacker)
 
 							pent->v.deadflag = DEAD_NO;   // bring back to life
 							
-							monsters[index].pMonster->Killed(VARS(pAttacker), 0);
+							if (monsters[index].pMonster != NULL)
+								monsters[index].pMonster->Killed(VARS(pAttacker), 0);
 							
 							monsters[index].killed = TRUE;
 						}
@@ -604,7 +608,7 @@ void check_monster_dead(edict_t *pAttacker)
 void check_player_dead( edict_t *pPlayer )
 {
 	// Death messages are disabled
-	if (!monster_show_deaths->value)
+	if (!monster_show_deaths || !monster_show_deaths->value)
 		return;
 	
 	int iPlayerIndex = ENTINDEX( pPlayer );
@@ -753,7 +757,7 @@ void check_player_dead( edict_t *pPlayer )
 void check_monster_info( edict_t *pPlayer )
 {
 	// Monster Info is disabled
-	if (!monster_show_info->value)
+	if (!monster_show_info || !monster_show_info->value)
 		return;
 	
 	// Player must be alive
@@ -1020,7 +1024,7 @@ void check_respawn(void)
 	int spawnflags;
 	pKVD *keyvalue;
 	
-	if (!monster_spawn->value)
+	if (!monster_spawn || !monster_spawn->value)
 		return;  // monster_spawn is turned off, retry again later
 
 	for (int index=0; index < monster_spawn_count; index++)
@@ -1748,7 +1752,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	{
 		if (monster_types[index].need_to_precache)
 		{
-			if (dllapi_log->value)
+			if (dllapi_log && dllapi_log->value)
 			{
 				LOG_MESSAGE(PLID, "Precaching %s models & sounds...", monster_types[index].name);
 			}
