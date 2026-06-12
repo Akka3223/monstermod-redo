@@ -498,7 +498,41 @@ void check_monster_hurt(edict_t *pAttacker)
 						pDamageSource = pAttacker;
 
 					if (pDamageSource && UTIL_IsPlayer(pDamageSource))
-					Monster_ProvokedByPlayer(pent, pDamageSource, pent->v.fuser4 - pent->v.health, 10.0f);
+					{
+						Monster_ProvokedByPlayer(pent, pDamageSource, pent->v.fuser4 - pent->v.health, 10.0f);
+
+						// Show damage hit indicator via DHUD
+						float flDmg = pent->v.fuser4 - pent->v.health;
+						if (flDmg > 0 && monsters[index].pMonster != NULL)
+						{
+							char szName[129];
+							if ( !FStringNull( monsters[index].pMonster->m_szMonsterName ) )
+								strcpy( szName, STRING( monsters[index].pMonster->m_szMonsterName ) );
+							else
+								strcpy( szName, STRING( pent->v.classname ) );
+
+							char szHitMsg[257];
+							const char *szPrefix = monsters[index].pMonster->IsElite() ? "Elite " : "";
+							sprintf( szHitMsg, "-%.0f  %s%s", flDmg, szPrefix, szName );
+
+							union { float f; long l; } fl;
+							long color = 255 + (60 << 8) + (40 << 16) + (200 << 24); // orange-red RGBA
+
+							MESSAGE_BEGIN( MSG_ONE, SVC_DIRECTOR, NULL, pDamageSource );
+							WRITE_BYTE( strlen( szHitMsg ) + 31 );
+							WRITE_BYTE( DRC_CMD_MESSAGE );
+							WRITE_BYTE( 0 );
+							WRITE_LONG( color );
+							fl.f = -1.0f; WRITE_LONG( fl.l );     // x = center
+							fl.f = 0.45f; WRITE_LONG( fl.l );     // y = upper-center
+							fl.f = 0.0f;  WRITE_LONG( fl.l );     // fadein
+							fl.f = 0.3f;  WRITE_LONG( fl.l );     // fadeout
+							fl.f = 1.5f;  WRITE_LONG( fl.l );     // hold
+							fl.f = 0.0f;  WRITE_LONG( fl.l );     // fx
+							WRITE_STRING( szHitMsg );
+							MESSAGE_END();
+						}
+					}
 					if (pent->v.takedamage != DAMAGE_NO)
 					{
 						TraceResult tr;
@@ -822,38 +856,58 @@ void check_monster_info( edict_t *pPlayer )
 					if ( classify == CLASS_HUMAN_PASSIVE || classify == CLASS_PLAYER_ALLY )
 						isAlly = TRUE;
 					
-					// Prepare the message
-					char szInfo[257];
-					sprintf(szInfo, "%s:  %s\nHealth:  %.0f\n", ( isAlly ? "Friend" : "Enemy" ), szName, monsterHealth );
-					
-					// Create a TE_TEXTMESSAGE and show the monster information
-					MESSAGE_BEGIN( MSG_ONE, SVC_TEMPENTITY, NULL, pPlayer );
-					WRITE_BYTE( TE_TEXTMESSAGE );
-					WRITE_BYTE( 3 ); // Channel
-					WRITE_SHORT( 327 ); // X
-					WRITE_SHORT( 4771 ); // Y
-					WRITE_BYTE( 0 ); // Effect
-					if ( isAlly )
+					// --- RPG-style compact display ---
+					char szDisplayName[160];
+					const char *szType = isAlly ? "Ally" : "Enemy";
+
+					if ( pMonster != NULL && pMonster->IsElite() )
 					{
-						WRITE_BYTE( 9 ); // R1
-						WRITE_BYTE( 172 ); // G1
-						WRITE_BYTE( 96 ); // B1
+						sprintf( szDisplayName, "Elite %s", szName );
 					}
 					else
 					{
-						WRITE_BYTE( 171 ); // R1
-						WRITE_BYTE( 23 ); // G1
-						WRITE_BYTE( 7 ); // B1
+						strcpy( szDisplayName, szName );
 					}
-					WRITE_BYTE( 0 ); // A1
-					WRITE_BYTE( 207 ); // R2
-					WRITE_BYTE( 23 ); // G2
-					WRITE_BYTE( 7 ); // B2
-					WRITE_BYTE( 255 ); // A2
-					WRITE_SHORT( 0 ); // Fade-in Time
-					WRITE_SHORT( 15 ); // Fade-out Time
-					WRITE_SHORT( 448 ); // Hold time
-					WRITE_STRING( szInfo ); // Message
+
+					float flMaxHealth = tr.pHit->v.max_health;
+					if ( flMaxHealth < 1.0f )
+						flMaxHealth = monsterHealth;
+
+					int barSegments = 10;
+					int filled = (int)( ( monsterHealth / flMaxHealth ) * barSegments );
+					if ( filled < 0 ) filled = 0;
+					if ( filled > barSegments ) filled = barSegments;
+
+					char szBar[11];
+					for ( int i = 0; i < barSegments; i++ )
+						szBar[i] = ( i < filled ) ? '#' : '-';
+					szBar[barSegments] = 0;
+
+					char szInfo[257];
+					sprintf( szInfo, "%s  [%s]  %.0f/%.0f",
+						szDisplayName, szBar, monsterHealth, flMaxHealth );
+					
+					// Create a DHUD (SVC_DIRECTOR) message and show the monster information
+					union { float f; long l; } fl;
+
+					// Build RGBA color from separate R/G/B/A values
+					long color = (isAlly ? 9 : 171)
+							   + ((isAlly ? 172 : 23) << 8)
+							   + ((isAlly ? 96 : 7) << 16)
+							   + (0 << 24);
+
+					MESSAGE_BEGIN( MSG_ONE, SVC_DIRECTOR, NULL, pPlayer );
+					WRITE_BYTE( strlen( szInfo ) + 31 );  // total director data length
+					WRITE_BYTE( DRC_CMD_MESSAGE );        // command: HUD message
+					WRITE_BYTE( 0 );                      // effect: 0 = instant
+					WRITE_LONG( color );                  // RGBA color
+					fl.f = -1.0f; WRITE_LONG( fl.l );     // x = center
+					fl.f = 0.90f; WRITE_LONG( fl.l );     // y = near bottom
+					fl.f = 0.0f;  WRITE_LONG( fl.l );     // fade-in time (seconds)
+					fl.f = 1.7f;  WRITE_LONG( fl.l );     // fade-out time (seconds)
+					fl.f = 44.8f; WRITE_LONG( fl.l );     // hold time (seconds)
+					fl.f = 0.0f;  WRITE_LONG( fl.l );     // fx time (seconds)
+					WRITE_STRING( szInfo );               // message text
 					MESSAGE_END();
 					
 					// Delay till next scan

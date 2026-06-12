@@ -353,6 +353,10 @@
 // short life in 0.1 s
 // 3 bytes r, g, b
 
+
+#define SVC_DIRECTOR		51
+#define DRC_CMD_MESSAGE		6
+
 #define TE_BOX				31
 // coord, coord, coord		boxmins
 // coord, coord, coord		boxmaxs

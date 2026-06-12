@@ -249,7 +249,7 @@ void CMBaseMonster :: EliteInit ( void )
 		// Corrupted value — reset to non-elite
 		pev->renderfx = kRenderFxNone;
 		pev->rendermode = kRenderNormal;
-		pev->renderamt = 0;
+		pev->renderamt = 1.0;
 		m_iEliteAffix = ELITE_NONE;
 		m_flEliteDmgMult = 1.0f;
 		break;
