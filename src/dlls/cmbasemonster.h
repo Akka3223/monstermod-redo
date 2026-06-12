@@ -91,6 +91,10 @@ public:
 
 		int					m_iMaxHealth;// keeps track of monster's maximum health value (for re-healing, etc)
 
+	// ---- Elite variant system ----
+	int					m_iEliteAffix;		// ELITE_NONE (0) or ELITE_BULWARK/SWIFT/BRUTAL
+	float				m_flEliteDmgMult;	// damage multiplier for melee (1.0 = normal, 1.4 = brutal)
+
 	Vector				m_vecEnemyLKP;// last known position of enemy. (enemy's origin)
 
 	int					m_cAmmoLoaded;		// how much ammo is in the weapon (used to trigger reload anim sequences)
@@ -144,6 +148,12 @@ public:
 
 	virtual BOOL	IsAlive( void ) { return (pev->deadflag != DEAD_DEAD); }
 	virtual BOOL	ShouldFadeOnDeath( void );
+
+// Elite variant system
+	void			EliteInit( void );			// roll chance, assign affix + glow + stats
+	BOOL			IsElite( void ) const { return m_iEliteAffix > 0; }
+	int				GetEliteAffix( void ) const { return m_iEliteAffix; }
+	float			GetEliteDmgMult( void ) const { return m_flEliteDmgMult; }
 
 // Basic Monster AI functions
 	virtual float ChangeYaw ( int speed );

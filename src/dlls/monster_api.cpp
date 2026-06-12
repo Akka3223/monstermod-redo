@@ -97,6 +97,8 @@ cvar_t init_globalsoundlist = {"monster_gsr", "", FCVAR_EXTDLL, 0, NULL};
 cvar_t *globalsoundlist = NULL;
 cvar_t init_monster_default_maxrange = {"monster_default_maxrange", "2048", FCVAR_EXTDLL, 0, NULL};
 cvar_t *monster_default_maxrange = NULL;
+cvar_t init_monster_elite_chance = {"monster_elite_chance", "4", FCVAR_EXTDLL, 0, NULL};
+cvar_t *monster_elite_chance = NULL;
 
 
 // Metamod requesting info about this plugin:
@@ -169,6 +171,9 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 
 	CVAR_REGISTER(&init_monster_default_maxrange);
 	monster_default_maxrange = CVAR_GET_POINTER("monster_default_maxrange");
+
+	CVAR_REGISTER(&init_monster_elite_chance);
+	monster_elite_chance = CVAR_GET_POINTER("monster_elite_chance");
 
 	return(TRUE);
 }

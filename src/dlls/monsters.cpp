@@ -41,8 +41,61 @@ extern CGraph WorldGraph;// the world node graph
 
 extern cvar_t *monster_turn_coeficient;
 extern cvar_t *monster_default_maxrange;
+extern cvar_t *monster_elite_chance;
 
 extern void process_monster_sound(edict_t *pMonster, char *fileName);
+
+//=========================================================
+// EliteInit — called at the end of MonsterInit.
+// Rolls elite chance, assigns a random affix, applies
+// glow shell and stat modifiers.
+//=========================================================
+void CMBaseMonster :: EliteInit ( void )
+{
+	m_iEliteAffix = ELITE_NONE;
+	m_flEliteDmgMult = 1.0f;
+
+	if (!monster_elite_chance)
+		return;
+
+	float flChance = monster_elite_chance->value;
+	if (flChance <= 0.0f)
+		return;
+
+	if (RANDOM_FLOAT(0.0f, 100.0f) > flChance)
+		return;
+
+	// Roll random affix
+	m_iEliteAffix = RANDOM_LONG(1, ELITE_COUNT);
+
+	// Store in iuser3 so external code (XP plugins etc.) can detect it
+	pev->iuser3 = m_iEliteAffix;
+
+	// Apply glow shell with affix-specific color
+	pev->rendermode = kRenderNormal;
+	pev->renderfx = kRenderFxGlowShell;
+	pev->renderamt = 25;
+
+	switch (m_iEliteAffix)
+	{
+	case ELITE_BULWARK:
+		pev->rendercolor = Vector(60, 120, 255);	// blue
+		pev->health *= 1.50f;
+		pev->max_health = pev->health;
+		break;
+	case ELITE_SWIFT:
+		pev->rendercolor = Vector(255, 220, 60);	// yellow
+		pev->health *= 1.15f;
+		pev->max_health = pev->health;
+		break;
+	case ELITE_BRUTAL:
+		pev->rendercolor = Vector(255, 60, 60);		// red
+		pev->health *= 1.20f;
+		pev->max_health = pev->health;
+		m_flEliteDmgMult = 1.40f;
+		break;
+	}
+}
 
 //=========================================================
 // Eat - makes a monster full for a little while.
@@ -271,6 +324,10 @@ void CMBaseMonster :: MonsterThink ( void )
 	
 	pev->nextthink = gpGlobals->time + 0.1;// keep monster thinking.
 	RunAI();
+
+	// Elite swift: +40% move speed after RunAI sets the base speed
+	if (m_iEliteAffix == ELITE_SWIFT)
+		m_flGroundSpeed *= 1.40f;
 
 	float flInterval = StudioFrameAdvance( ); // animate
 // start or end a fidget
@@ -1702,6 +1759,9 @@ void CMBaseMonster :: MonsterInit ( void )
 	SetThink( &CMBaseMonster::MonsterInitThink );
 	pev->nextthink = gpGlobals->time + 0.1;
 	SetUse ( &CMBaseMonster::MonsterUse );
+
+	// Roll for elite variant after health is finalized
+	EliteInit();
 }
 
 //=========================================================

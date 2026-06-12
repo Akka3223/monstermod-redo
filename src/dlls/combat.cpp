@@ -1267,6 +1267,10 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 
 		if ( iDamage > 0 )
 		{
+			// Elite brutal: +40% melee damage
+			if (m_flEliteDmgMult > 1.0f)
+				iDamage = (int)(iDamage * m_flEliteDmgMult);
+
 			if (UTIL_IsPlayer(pEntity))
 				UTIL_TakeDamage( pEntity, pev, pev, iDamage, iDmgType );
 			else if (pEntity->v.euser4 != NULL)
@@ -1276,6 +1280,15 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 			}
 			else
 				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType );
+
+			// ---- Elite affix modifiers ----
+			if (m_iEliteAffix == ELITE_SWIFT)
+			{
+				// Swift: 30% faster next attack
+				float flNext = gpGlobals->time + 0.7f;
+				if (flNext < m_flNextAttack)
+					m_flNextAttack = flNext;
+			}
 		}
 
 		return pEntity;

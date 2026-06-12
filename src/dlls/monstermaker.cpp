@@ -291,11 +291,16 @@ void CMMonsterMaker::MakeMonster( void )
 		pent->v.targetname = pev->netname;
 	}
 	
-	// Pass parent's rendering effects to child
-	pent->v.rendermode = pev->rendermode;
-	pent->v.renderfx = pev->renderfx;
-	pent->v.renderamt = pev->renderamt;
-	pent->v.rendercolor = pev->rendercolor;
+	// Pass parent's rendering effects to child — but only if the maker
+	// actually has custom render settings (non-zero renderamt).
+	// Elite monsters set their own glow in EliteInit, don't overwrite it.
+	if (pev->renderamt > 0 || pev->rendermode != kRenderNormal || pev->renderfx != kRenderFxNone)
+	{
+		pent->v.rendermode = pev->rendermode;
+		pent->v.renderfx = pev->renderfx;
+		pent->v.renderamt = pev->renderamt;
+		pent->v.rendercolor = pev->rendercolor;
+	}
 
 	// Soundlist isn't "exactly" a keyvalue so pass it here
 	if ( m_srSoundList != NULL )

@@ -91,6 +91,13 @@ BOOL FBoxVisible ( entvars_t *pevLooker, entvars_t *pevTarget, Vector &vecTarget
 #define R_HT	2// (HATE)will attack this character instead of any visible DISLIKEd characters
 #define R_NM	3// (NEMESIS)  A monster Will ALWAYS attack its nemsis, no matter what
 
+// Elite monster affixes — stored in pev->iuser3 for external detection
+#define ELITE_NONE			0
+#define ELITE_BULWARK		1	// +50% HP, blue glow
+#define ELITE_SWIFT			2	// +40% move speed, +30% attack speed, yellow glow
+#define ELITE_BRUTAL		3	// +40% melee damage, red glow
+#define ELITE_COUNT			3	// total number of affix types (for random roll)
+
 
 // these bits represent the monster's memory
 #define MEMORY_CLEAR					0
