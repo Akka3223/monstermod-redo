@@ -148,6 +148,8 @@ void CMBear::HandleAnimEvent(MonsterEvent_t *pEvent)
 			edict_t *pHurt = CheckTraceHullAttack(100, RANDOM_FLOAT(26, 28), DMG_SLASH);
 			if (pHurt)
 			{
+				UTIL_ApplyDoT(pHurt, pev, 10.0, DMG_POISON, 2.0f, 3);
+
 				if (pHurt->v.flags & (FL_MONSTER | FL_CLIENT))
 				{
 					pHurt->v.punchangle.z = 18;
