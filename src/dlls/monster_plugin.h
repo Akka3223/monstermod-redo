@@ -28,6 +28,8 @@ typedef struct
    edict_t *monster_pent;
    bool killed;
    CMBaseMonster *pMonster;
+   Vector spawn_origin;
+   float next_wander_time;
 } monster_t;
 
 #define MAX_MONSTER_ENTS 2024

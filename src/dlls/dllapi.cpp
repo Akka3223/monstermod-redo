@@ -330,6 +330,69 @@ static void ProcessDoTEffects(void)
 	}
 }
 
+static void UpdateMonsterLeashAndWander(void)
+{
+	const float kLeashRadius = 768.0f;
+	const float kWanderRadius = 392.0f;
+	const float kLeashSpeed = 160.0f;
+	const float kWanderSpeed = 80.0f;
+
+	for (int index = 0; index < monster_ents_used; index++)
+	{
+		if (!monsters[index].monster_index || monsters[index].pMonster == NULL)
+			continue;
+
+		edict_t *pMonsterEnt = monsters[index].monster_pent;
+		if (!pMonsterEnt || pMonsterEnt->free)
+			continue;
+
+		if (pMonsterEnt->v.movetype != MOVETYPE_STEP)
+			continue;
+
+		if (monsters[index].pMonster->m_hEnemy != NULL)
+			continue;
+
+		if (!UTIL_IsAlive(pMonsterEnt))
+			continue;
+
+		Vector vecToHome = monsters[index].spawn_origin - pMonsterEnt->v.origin;
+		float flDistHome = vecToHome.Length();
+
+		if (flDistHome > kLeashRadius)
+		{
+			Vector vecDir = vecToHome.Normalize();
+			monsters[index].pMonster->MakeIdealYaw(monsters[index].spawn_origin);
+			monsters[index].pMonster->ChangeYaw(300);
+			pMonsterEnt->v.velocity.x = vecDir.x * kLeashSpeed;
+			pMonsterEnt->v.velocity.y = vecDir.y * kLeashSpeed;
+			monsters[index].next_wander_time = gpGlobals->time + RANDOM_FLOAT(2.0f, 4.0f);
+			continue;
+		}
+
+		if (monsters[index].next_wander_time > gpGlobals->time)
+			continue;
+
+		if (pMonsterEnt->v.velocity.Length2D() > 30.0f)
+			continue;
+
+		Vector vecOffset(RANDOM_FLOAT(-kWanderRadius, kWanderRadius), RANDOM_FLOAT(-kWanderRadius, kWanderRadius), 0.0f);
+		Vector vecWanderGoal = monsters[index].spawn_origin + vecOffset;
+
+		TraceResult tr;
+		UTIL_TraceHull(pMonsterEnt->v.origin, vecWanderGoal, dont_ignore_monsters, human_hull, pMonsterEnt, &tr);
+		if (tr.flFraction > 0.60f)
+		{
+			Vector vecDir = (vecWanderGoal - pMonsterEnt->v.origin).Normalize();
+			monsters[index].pMonster->MakeIdealYaw(vecWanderGoal);
+			monsters[index].pMonster->ChangeYaw(300);
+			pMonsterEnt->v.velocity.x = vecDir.x * kWanderSpeed;
+			pMonsterEnt->v.velocity.y = vecDir.y * kWanderSpeed;
+		}
+
+		monsters[index].next_wander_time = gpGlobals->time + RANDOM_FLOAT(3.0f, 6.0f);
+	}
+}
+
 bool process_monster_cfg(void);
 bool process_monster_precache_cfg(void);
 
@@ -364,6 +427,8 @@ void FreeMonsterIndex(int index)
 	monsters[index].monster_pent = NULL;
 	monsters[index].killed = FALSE;
 	monsters[index].pMonster = NULL;
+	monsters[index].spawn_origin = Vector(0, 0, 0);
+	monsters[index].next_wander_time = 0.0f;
 	
 	if (index == monster_ents_used-1)
 	{
@@ -428,6 +493,12 @@ void check_monster_hurt(edict_t *pAttacker)
 			{
 				if (pent->v.health < pent->v.fuser4)
 				{
+					edict_t *pDamageSource = pent->v.dmg_inflictor;
+					if (pDamageSource == NULL || FNullEnt(pDamageSource) || pDamageSource->free)
+						pDamageSource = pAttacker;
+
+					if (pDamageSource && UTIL_IsPlayer(pDamageSource))
+					Monster_ProvokedByPlayer(pent, pDamageSource, pent->v.fuser4 - pent->v.health, 10.0f);
 					if (pent->v.takedamage != DAMAGE_NO)
 					{
 						TraceResult tr;
@@ -440,21 +511,24 @@ void check_monster_hurt(edict_t *pAttacker)
 						UTIL_ClientPrintAll( HUD_PRINTTALK, szMessage );
  */
 
-						vecSrc = pAttacker->v.origin + pAttacker->v.view_ofs;
+						if (pDamageSource == NULL || FNullEnt(pDamageSource) || pDamageSource->free)
+							pDamageSource = pent;
+
+						vecSrc = pDamageSource->v.origin + pDamageSource->v.view_ofs;
 						vecSpot = pent->v.origin;
 
 						// distance the blood can travel from the body...
 						distance = (vecSpot - vecSrc).Length() + 100.0f;
 
 						// use aiming angles of attacker to trace blood splatter...
-						UTIL_MakeVectors(pAttacker->v.v_angle);
+						UTIL_MakeVectors(pDamageSource->v.v_angle);
 
 						// start just beyond the attacker's body...
 						vecSrc = vecSrc + gpGlobals->v_forward * 20;
 						vecSpot = vecSrc + gpGlobals->v_forward * distance;
 
 						// trace a line ignoring enemies body...
-						UTIL_TraceLine ( vecSrc, vecSpot, dont_ignore_monsters, pAttacker, &tr );
+						UTIL_TraceLine ( vecSrc, vecSpot, dont_ignore_monsters, pDamageSource, &tr );
 
 						damage = pent->v.fuser4 - pent->v.health;
 
@@ -464,13 +538,13 @@ void check_monster_hurt(edict_t *pAttacker)
 						ClearMultiDamage( );
 						if (strncmp( STRING( pent->v.classname ), "monster_", 8 ) == 0 && pent->v.flags & FL_MONSTER)
 						{
-							monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_GIB_CORPSE );
+							monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_GIB_CORPSE );
 						}
 						else
 						{
-							monsters[index].pMonster->TraceAttack( VARS(pAttacker), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB);
+							monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_NEVERGIB);
 						}
-						ApplyMultiDamage( VARS(pAttacker), VARS(pAttacker) );
+						ApplyMultiDamage( VARS(pDamageSource), VARS(pDamageSource) );
 					}
 
 					// save the new current health as previous health...
@@ -894,6 +968,8 @@ edict_t* spawn_monster(int monster_type, Vector origin, Vector angles, int spawn
 	monsters[monster_index].monster_pent = monster_pent;
 
 	monsters[monster_index].monster_index = (*g_engfuncs.pfnIndexOfEdict)(monster_pent);
+	monsters[monster_index].spawn_origin = origin;
+	monsters[monster_index].next_wander_time = gpGlobals->time + RANDOM_FLOAT(1.5f, 3.0f);
 
 	monster_pent->v.origin = origin;
 	monster_pent->v.angles = angles;
@@ -1475,6 +1551,7 @@ int mmDispatchSpawn( edict_t *pent )
 
 		monster_spawn_count = 0;
 		node_spawn_count = 0;
+		Monster_ResetAggroTimers();
 		
 		m_d2category_monster[0] = -1;
 		m_d2category_monster[1] = -1;
@@ -1508,6 +1585,8 @@ int mmDispatchSpawn( edict_t *pent )
 			monsters[index].monster_pent = NULL;
 			monsters[index].killed = FALSE;  // not killed yet
 			monsters[index].pMonster = NULL;
+			monsters[index].spawn_origin = Vector(0, 0, 0);
+			monsters[index].next_wander_time = 0.0f;
 		}
 
 		monster_ents_used = 0;
@@ -1729,6 +1808,8 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 		monsters[index].monster_pent = NULL;
 		monsters[index].killed = FALSE;  // not killed yet
 		monsters[index].pMonster = NULL;
+		monsters[index].spawn_origin = Vector(0, 0, 0);
+		monsters[index].next_wander_time = 0.0f;
 	}
 	
 	for (index = 0; index < 33; index++)
@@ -1737,6 +1818,7 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 		g_PlayerKilled[index] = false;
 		g_NextMessage[index] = 0.0;
 	}
+	Monster_ResetAggroTimers();
 
 	monster_ents_used = 0;
 	ResetDoTEffects();
@@ -1747,6 +1829,8 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 void mmStartFrame( void )
 {
 	ProcessDoTEffects();
+	UpdateMonsterLeashAndWander();
+
 	// Don't generate node graph right away
 	if (check_graph_time != -1 && check_graph_time <= gpGlobals->time)
 	{
@@ -1938,8 +2022,10 @@ void mmDispatchThink_Post( edict_t *pent )
 
 void mmPlayerPostThink_Post( edict_t *pEntity )
 {
-/* 	check_monster_hurt(pEntity);
-	check_monster_dead(pEntity); */
+	// Called with the player as the attacker — this correctly identifies who damaged our monsters.
+	// check_monster_hurt compares health vs fuser4 snapshot; once consumed the monster-think call
+	// sees health == fuser4 and does nothing, so there is no double-processing.
+	check_monster_hurt(pEntity);
 	//check_player_dead(pEntity); // too early for damageBits
 	check_monster_info(pEntity);
 	

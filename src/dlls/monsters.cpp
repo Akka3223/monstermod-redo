@@ -45,6 +45,134 @@ extern cvar_t *monster_elite_chance;
 
 extern void process_monster_sound(edict_t *pMonster, char *fileName);
 
+#define MAX_MONSTER_AGGRO_TIMERS 64
+
+typedef struct monster_aggro_timer_s
+{
+	string_t classname;
+	float expires;
+} monster_aggro_timer_t;
+
+static monster_aggro_timer_t g_monsterAggroTimers[MAX_MONSTER_AGGRO_TIMERS];
+
+void Monster_ResetAggroTimers(void)
+{
+	for (int index = 0; index < MAX_MONSTER_AGGRO_TIMERS; index++)
+	{
+		g_monsterAggroTimers[index].classname = iStringNull;
+		g_monsterAggroTimers[index].expires = 0.0f;
+	}
+}
+
+static int FindMonsterAggroTimer(string_t iszClassname)
+{
+	for (int index = 0; index < MAX_MONSTER_AGGRO_TIMERS; index++)
+	{
+		if (g_monsterAggroTimers[index].classname == iszClassname)
+			return index;
+	}
+
+	return -1;
+}
+
+BOOL Monster_IsAggroActiveForClass(string_t iszClassname)
+{
+	if (FStringNull(iszClassname))
+		return FALSE;
+
+	int index = FindMonsterAggroTimer(iszClassname);
+	if (index == -1)
+		return FALSE;
+
+	if (g_monsterAggroTimers[index].expires < gpGlobals->time)
+	{
+		g_monsterAggroTimers[index].classname = iStringNull;
+		g_monsterAggroTimers[index].expires = 0.0f;
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+void Monster_RegisterAggroForClass(string_t iszClassname, float duration)
+{
+	if (FStringNull(iszClassname))
+		return;
+
+	if (duration <= 0.0f)
+		duration = 8.0f;
+
+	float flNewExpire = gpGlobals->time + duration;
+
+	int index = FindMonsterAggroTimer(iszClassname);
+	if (index != -1)
+	{
+		if (flNewExpire > g_monsterAggroTimers[index].expires)
+			g_monsterAggroTimers[index].expires = flNewExpire;
+		return;
+	}
+
+	int freeSlot = -1;
+	int oldestSlot = 0;
+	float oldestExpire = g_monsterAggroTimers[0].expires;
+
+	for (int i = 0; i < MAX_MONSTER_AGGRO_TIMERS; i++)
+	{
+		if (g_monsterAggroTimers[i].classname == iStringNull)
+		{
+			freeSlot = i;
+			break;
+		}
+
+		if (g_monsterAggroTimers[i].expires < oldestExpire)
+		{
+			oldestExpire = g_monsterAggroTimers[i].expires;
+			oldestSlot = i;
+		}
+	}
+
+	int writeSlot = (freeSlot != -1) ? freeSlot : oldestSlot;
+	g_monsterAggroTimers[writeSlot].classname = iszClassname;
+	g_monsterAggroTimers[writeSlot].expires = flNewExpire;
+}
+
+void Monster_ProvokedByPlayer(edict_t *pMonsterEdict, edict_t *pPlayerEdict, float flDamage, float duration)
+{
+	if (!pMonsterEdict || pMonsterEdict->free || !pPlayerEdict || pPlayerEdict->free)
+		return;
+
+	if (!UTIL_IsPlayer(pPlayerEdict) || pMonsterEdict->v.euser4 == NULL)
+		return;
+
+	CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pMonsterEdict));
+	if (!pMonster)
+		return;
+
+	int playerRelationship = pMonster->IRelationshipByClass(CLASS_PLAYER);
+	if (playerRelationship <= R_NO)
+		return;
+
+	if (duration <= 0.0f)
+		duration = 10.0f;
+
+	Monster_RegisterAggroForClass(pMonsterEdict->v.classname, duration);
+	pMonster->Remember(bits_MEMORY_PROVOKED);
+	pMonster->m_afMemory |= bits_MEMORY_PROVOKED;
+	pMonster->SetConditions(bits_COND_PROVOKED | bits_COND_LIGHT_DAMAGE);
+	if (flDamage >= 20.0f)
+		pMonster->SetConditions(bits_COND_HEAVY_DAMAGE);
+	pMonster->m_vecEnemyLKP = pPlayerEdict->v.origin;
+	pMonster->m_hTargetEnt = pPlayerEdict;
+
+	if (UTIL_FVisible(pPlayerEdict, pMonsterEdict) && UTIL_FInViewCone(pPlayerEdict, pMonsterEdict, pMonster->m_flFieldOfView))
+	{
+		pMonster->m_hEnemy = pPlayerEdict;
+		pMonster->SetConditions(bits_COND_NEW_ENEMY | bits_COND_SEE_CLIENT | bits_COND_SEE_DISLIKE | bits_COND_SEE_ENEMY);
+		pMonster->m_MonsterState = MONSTERSTATE_COMBAT;
+		pMonster->m_IdealMonsterState = MONSTERSTATE_COMBAT;
+	}
+}
+
 //=========================================================
 // EliteInit — called at the end of MonsterInit.
 // Rolls elite chance, assigns a random affix, applies
@@ -198,25 +326,34 @@ void CMBaseMonster :: Look ( int iDistance )
 				// is this a player AND are they alive?
 				if (UTIL_IsPlayer(pSightEnt) && UTIL_IsAlive(pSightEnt))
 				{
+					BOOL allowPlayerAggro = Monster_IsAggroActiveForClass(pev->classname);
+
 					// the looker will want to consider this entity
 					// don't check anything else about an entity that can't be seen.
 					if ( UTIL_FInViewCone( pSightEnt, ENT(pev), m_flFieldOfView ) && !FBitSet( pSightEnt->v.flags, FL_NOTARGET ) && UTIL_FVisible( pSightEnt, ENT(pev) ) )
 					{
-						m_edictList[m_edictList_count] = pSightEnt;
-						m_edictList_count++;
-
 						// if we see a client, remember that (mostly for scripted AI)
 						iSighted |= bits_COND_SEE_CLIENT;
 
-						// is this monster NOT a scientist?
-						if (strcmp(STRING(pev->model), "models/scientist.mdl") != 0)
+						// only hostile monsters target players
+						// Aggro spread is limited to 150 units — prevents the entire class from
+						// chain-aggroing across the map. Exception: if this player is already
+						// our current enemy we can always see them regardless of distance.
+						if (allowPlayerAggro && IRelationshipByClass(CLASS_PLAYER) > R_NO)
 						{
-							iSighted |= bits_COND_SEE_DISLIKE;
-
-							if ( pSightEnt == m_hEnemy )
+							float flDistToPlayer = (pSightEnt->v.origin - pev->origin).Length();
+							if (flDistToPlayer <= 150.0f || pSightEnt == m_hEnemy)
 							{
-								// we know this ent is visible, so if it also happens to be our enemy, store that now.
-								iSighted |= bits_COND_SEE_ENEMY;
+								m_edictList[m_edictList_count] = pSightEnt;
+								m_edictList_count++;
+
+								iSighted |= bits_COND_SEE_DISLIKE;
+
+								if ( pSightEnt == m_hEnemy )
+								{
+									// we know this ent is visible, so if it also happens to be our enemy, store that now.
+									iSighted |= bits_COND_SEE_ENEMY;
+								}
 							}
 						}
 					}
@@ -723,6 +860,37 @@ BOOL CMBaseMonster :: CheckMeleeAttack2 ( float flDot, float flDist )
 	return FALSE;
 }
 
+static float EnemyFacingDotToMonster(edict_t *pEnemy, edict_t *pMonster)
+{
+	if (!pEnemy || !pMonster)
+		return -1.0f;
+
+	float forward[3], right[3], up[3];
+	UTIL_MakeVectorsPrivate(pEnemy->v.angles, forward, right, up);
+
+	Vector2D enemyForward(forward[0], forward[1]);
+	Vector2D toMonster = (pMonster->v.origin - pEnemy->v.origin).Make2D();
+
+	toMonster = toMonster.Normalize();
+	enemyForward = enemyForward.Normalize();
+
+	return DotProduct(enemyForward, toMonster);
+}
+
+static BOOL IsMeleeGeometryTight(entvars_t *pev)
+{
+	if (!pev)
+		return FALSE;
+
+	TraceResult tr;
+	Vector vecStart = pev->origin;
+	vecStart.z += pev->size.z * 0.5f;
+	Vector vecEnd = vecStart + gpGlobals->v_forward * 96.0f;
+
+	UTIL_TraceHull(vecStart, vecEnd, dont_ignore_monsters, human_hull, ENT(pev), &tr);
+	return (tr.flFraction < 0.65f);
+}
+
 //=========================================================
 // CheckAttacks - sets all of the bits for attacks that the
 // monster is capable of carrying out on the passed entity.
@@ -766,6 +934,52 @@ void CMBaseMonster :: CheckAttacks ( edict_t *pTarget, float flDist )
 		if ( CheckMeleeAttack2 ( flDot, flDist ) )
 			SetConditions( bits_COND_CAN_MELEE_ATTACK2 );
 	}
+
+	// Context-aware attack preference. We keep this as a soft selector by
+	// suppressing lower-value attack families when both are available.
+	const BOOL canRange = HasConditions(bits_COND_CAN_RANGE_ATTACK1 | bits_COND_CAN_RANGE_ATTACK2);
+	const BOOL canMelee = HasConditions(bits_COND_CAN_MELEE_ATTACK1 | bits_COND_CAN_MELEE_ATTACK2);
+
+	if (canRange && canMelee)
+	{
+		const float enemySpeed = pTarget->v.velocity.Length2D();
+		const float enemyFacingDot = EnemyFacingDotToMonster(pTarget, ENT(pev));
+		const BOOL enemyIsFacingUs = (enemyFacingDot > 0.35f);
+		const BOOL enemyMovingFast = (enemySpeed > 220.0f);
+		const BOOL tightGeometry = IsMeleeGeometryTight(pev);
+
+		int meleeScore = 0;
+		int rangeScore = 0;
+
+		if (flDist <= 96.0f)
+			meleeScore += 3;
+		else if (flDist >= 196.0f)
+			rangeScore += 2;
+
+		if (enemyMovingFast)
+			rangeScore += 2;
+		else
+			meleeScore += 1;
+
+		if (enemyIsFacingUs)
+			rangeScore += 1;
+		else
+			meleeScore += 1;
+
+		if (tightGeometry)
+			rangeScore += 2;
+		else
+			meleeScore += 1;
+
+		if (rangeScore > meleeScore)
+		{
+			ClearConditions(bits_COND_CAN_MELEE_ATTACK1 | bits_COND_CAN_MELEE_ATTACK2);
+		}
+		else if (meleeScore > rangeScore)
+		{
+			ClearConditions(bits_COND_CAN_RANGE_ATTACK1 | bits_COND_CAN_RANGE_ATTACK2);
+		}
+	}
 }
 
 //=========================================================
@@ -794,6 +1008,13 @@ int CMBaseMonster :: CheckEnemy ( edict_t *pEnemy )
 
 	iUpdatedLKP = FALSE;
 	ClearConditions ( bits_COND_ENEMY_FACING_ME );
+
+	if (UTIL_IsPlayer(pEnemy) && !Monster_IsAggroActiveForClass(pev->classname))
+	{
+		ClearConditions(bits_COND_SEE_ENEMY | bits_COND_ENEMY_OCCLUDED);
+		m_hEnemy = NULL;
+		return FALSE;
+	}
 	
 	if ( !UTIL_FVisible( pEnemy, ENT(pev) ) )
 	{
@@ -2176,6 +2397,12 @@ edict_t *CMBaseMonster :: BestVisibleEnemy ( void )
 		
 		if ( UTIL_IsPlayer(pEnt) )
 		{
+			if (!Monster_IsAggroActiveForClass(pev->classname))
+			{
+				edictList_index++;
+				continue;
+			}
+
 			// it's a player...
 			if ( UTIL_IsAlive(pEnt) )
 			{

@@ -855,6 +855,13 @@ int CMBaseMonster :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker
 		return DeadTakeDamage( pevInflictor, pevAttacker, flDamage, bitsDamageType );
 	}
 
+	if (pevAttacker)
+	{
+		edict_t *pAttacker = ENT(pevAttacker);
+		if (pAttacker && UTIL_IsPlayer(pAttacker) && pev->euser4 != NULL)
+			Monster_ProvokedByPlayer(ENT(pev), pAttacker, flDamage, 10.0f);
+	}
+
 	if ( pev->deadflag == DEAD_NO )
 	{
 		// no pain sound during death animation.
@@ -1264,6 +1271,25 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 	if ( tr.pHit )
 	{
 		edict_t *pEntity = tr.pHit;
+		Vector vecImpactDir = (UTIL_Center(pEntity) - UTIL_Center(ENT(pev))).Normalize();
+
+		// Avoid self-disrupting ally hits when monsters stack in tight melee.
+		if (pEntity->v.euser4 != NULL)
+		{
+			CMBaseMonster *pHitMonster = GetClassPtr((CMBaseMonster *)VARS(pEntity));
+			if (pHitMonster != NULL)
+			{
+				int relationship = IRelationship(pHitMonster);
+				if (relationship <= R_NO)
+				{
+					if ((pEntity->v.flags & FL_ONGROUND) && pEntity->v.movetype == MOVETYPE_STEP)
+					{
+						pEntity->v.velocity = pEntity->v.velocity + vecImpactDir * 70.0f;
+					}
+					return NULL;
+				}
+			}
+		}
 
 		if ( iDamage > 0 )
 		{
@@ -1280,6 +1306,26 @@ edict_t* CMBaseMonster :: CheckTraceHullAttack( float flDist, int iDamage, int i
 			}
 			else
 				UTIL_TakeDamageExternal( pEntity, pev, pev, iDamage, iDmgType );
+
+			// Directional impact alignment for better combat feedback.
+			if (pEntity->v.movetype == MOVETYPE_STEP || pEntity->v.movetype == MOVETYPE_WALK)
+			{
+				float flImpactForce = (float)iDamage * 2.5f;
+				if (flImpactForce > 240.0f)
+					flImpactForce = 240.0f;
+				pEntity->v.velocity = pEntity->v.velocity + vecImpactDir * flImpactForce;
+			}
+
+			int bloodColor = pEntity->v.iuser3;
+			if (!bloodColor)
+				bloodColor = BLOOD_COLOR_RED;
+			if (bloodColor != DONT_BLEED)
+			{
+				int bloodAmount = iDamage * 2;
+				if (bloodAmount > 60)
+					bloodAmount = 60;
+				UTIL_BloodDrips(UTIL_Center(pEntity), vecImpactDir, bloodColor, bloodAmount);
+			}
 
 			// ---- Elite affix modifiers ----
 			if (m_iEliteAffix == ELITE_SWIFT)

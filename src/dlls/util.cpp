@@ -2059,6 +2059,13 @@ void UTIL_TraceAttack( edict_t *pEdict, entvars_t *pevAttacker, float flDamage, 
 
 	if ( pEdict->v.takedamage )
 	{
+		if (pevAttacker)
+		{
+			edict_t *pAttacker = ENT(pevAttacker);
+			if (pAttacker && UTIL_IsPlayer(pAttacker) && pEdict->v.euser4 != NULL)
+				Monster_ProvokedByPlayer(pEdict, pAttacker, flDamage, 10.0f);
+		}
+
 		int bloodColor = pEdict->v.iuser3;
 		if ( !bloodColor )
 			bloodColor = BLOOD_COLOR_RED;
@@ -2148,6 +2155,13 @@ bool UTIL_IsBSPModel( edict_t *pent )
 
 void UTIL_TakeDamageExternal( edict_t *pEdict, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
 {
+	if (pevAttacker)
+	{
+		edict_t *pAttacker = ENT(pevAttacker);
+		if (pAttacker && UTIL_IsPlayer(pAttacker) && pEdict && pEdict->v.euser4 != NULL)
+			Monster_ProvokedByPlayer(pEdict, pAttacker, flDamage, 10.0f);
+	}
+
 	// Tell AMXX to call TakeDamage for us if it can.
 	if (CVAR_GET_FLOAT("_glb_takedamage"))
 	{

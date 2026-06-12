@@ -68,9 +68,20 @@ void ApplyMultiDamage(entvars_t *pevInflictor, entvars_t *pevAttacker )
 	Vector		vecSpot1;//where blood comes from
 	Vector		vecDir;//direction blood should go
 	TraceResult	tr;
+	BOOL		bPlayerSource = FALSE;
 	
 	if ( !gMultiDamage.pEntity )
 		return;
+
+	if (pevAttacker)
+	{
+		edict_t *pAttacker = ENT(pevAttacker);
+		if (pAttacker && UTIL_IsPlayer(pAttacker))
+			bPlayerSource = TRUE;
+	}
+
+	if (bPlayerSource && gMultiDamage.pEntity->v.euser4 != NULL)
+		Monster_ProvokedByPlayer(gMultiDamage.pEntity, ENT(pevAttacker), gMultiDamage.amount, 10.0f);
 
 	if (UTIL_IsPlayer(gMultiDamage.pEntity))
 		UTIL_TakeDamage(gMultiDamage.pEntity, pevInflictor, pevAttacker, gMultiDamage.amount, gMultiDamage.type );

@@ -83,6 +83,11 @@ extern void ExplodeModel( const Vector &vecOrigin, float speed, int model, int c
 BOOL FBoxVisible ( entvars_t *pevLooker, entvars_t *pevTarget );
 BOOL FBoxVisible ( entvars_t *pevLooker, entvars_t *pevTarget, Vector &vecTargetOrigin, float flSize = 0.0 );
 
+void Monster_ResetAggroTimers( void );
+void Monster_RegisterAggroForClass( string_t iszClassname, float duration );
+BOOL Monster_IsAggroActiveForClass( string_t iszClassname );
+void Monster_ProvokedByPlayer( edict_t *pMonsterEdict, edict_t *pPlayerEdict, float flDamage, float duration );
+
 // monster to monster relationship types
 #define R_AL	-2 // (ALLY) pals. Good alternative to R_NO when applicable.
 #define R_FR	-1// (FEAR)will run

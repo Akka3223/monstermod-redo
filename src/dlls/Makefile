@@ -1,8 +1,9 @@
 CPP = g++
 BASEFLAGS = -Dstricmp=strcasecmp -Dstrcmpi=strcasecmp -m32 -fPIC -Wall -Werror
-# -O2
-OPTFLAGS = -O0 -g
-CPPFLAGS = ${BASEFLAGS} ${OPTFLAGS} -w -I. -I../engine -I../common -I../pm_shared -I../metamod
+OPTFLAGS ?= -O0
+DEBUGFLAGS = -g3 -ggdb -fno-omit-frame-pointer
+CPPFLAGS = ${BASEFLAGS} ${OPTFLAGS} ${DEBUGFLAGS} -w -I. -I../engine -I../common -I../pm_shared -I../metamod
+LDFLAGS = -m32 -fPIC -shared -g3 -ggdb -Wl,--build-id
 OBJ = \
 	agrunt.o \
 	AI_BaseNPC_Schedule.o \
@@ -74,7 +75,7 @@ OBJ = \
 	ankhet.o
 
 monster_mm_i386.so: ${OBJ}
-	${CPP} -m32 -fPIC -shared -o $@ ${OBJ}
+	${CPP} ${LDFLAGS} -o $@ ${OBJ}
 
 clean:
 	-rm -f *.o
