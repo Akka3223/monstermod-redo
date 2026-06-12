@@ -557,3 +557,4 @@ edict_t *UTIL_GetNextTarget( edict_t *pEntity );
 edict_t *UTIL_FindNearestPlayer(edict_t *pEdict, float m_flFieldOfView);
 bool UTIL_IsBSPModel( edict_t *pent );
 void UTIL_TakeDamageExternal( edict_t *pEdict, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
+void UTIL_ApplyDoT( edict_t *pVictim, entvars_t *pevAttacker, float flDamagePerTick, int bitsDamageType, float flInterval, int iTotalTicks );

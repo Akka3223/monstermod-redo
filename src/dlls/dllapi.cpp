@@ -194,6 +194,142 @@ int m_d2category_monster[8];
 float check_respawn_time;
 float check_graph_time;
 
+#define MAX_DOT_EFFECTS 128
+
+typedef struct dot_effect_s
+{
+	int victimIndex;
+	int attackerIndex;
+	float damagePerTick;
+	int damageType;
+	float nextTickTime;
+	float tickInterval;
+	int ticksLeft;
+} dot_effect_t;
+
+dot_effect_t g_dotEffects[MAX_DOT_EFFECTS];
+
+static void ResetDoTEffects(void)
+{
+	for (int index = 0; index < MAX_DOT_EFFECTS; index++)
+	{
+		g_dotEffects[index].victimIndex = 0;
+		g_dotEffects[index].attackerIndex = 0;
+		g_dotEffects[index].damagePerTick = 0.0f;
+		g_dotEffects[index].damageType = 0;
+		g_dotEffects[index].nextTickTime = 0.0f;
+		g_dotEffects[index].tickInterval = 0.0f;
+		g_dotEffects[index].ticksLeft = 0;
+	}
+}
+
+void UTIL_ApplyDoT(edict_t *pVictim, entvars_t *pevAttacker, float flDamagePerTick, int bitsDamageType, float flInterval, int iTotalTicks)
+{
+	if (!pVictim || pVictim->free || flDamagePerTick <= 0.0f || flInterval <= 0.0f || iTotalTicks <= 0 || bitsDamageType == 0)
+		return;
+
+	if (!pVictim->v.takedamage)
+		return;
+
+	int victimIndex = ENTINDEX(pVictim);
+	if (victimIndex <= 0)
+		return;
+
+	int attackerIndex = victimIndex;
+	if (pevAttacker != NULL)
+	{
+		edict_t *pAttacker = ENT(pevAttacker);
+		if (pAttacker != NULL && !pAttacker->free)
+			attackerIndex = ENTINDEX(pAttacker);
+	}
+
+	for (int index = 0; index < MAX_DOT_EFFECTS; index++)
+	{
+		if (g_dotEffects[index].victimIndex == victimIndex && g_dotEffects[index].attackerIndex == attackerIndex && g_dotEffects[index].damageType == bitsDamageType)
+		{
+			if (flDamagePerTick > g_dotEffects[index].damagePerTick)
+				g_dotEffects[index].damagePerTick = flDamagePerTick;
+			g_dotEffects[index].tickInterval = flInterval;
+			g_dotEffects[index].ticksLeft = iTotalTicks;
+			g_dotEffects[index].nextTickTime = gpGlobals->time + flInterval;
+			return;
+		}
+	}
+
+	for (int index = 0; index < MAX_DOT_EFFECTS; index++)
+	{
+		if (g_dotEffects[index].victimIndex == 0)
+		{
+			g_dotEffects[index].victimIndex = victimIndex;
+			g_dotEffects[index].attackerIndex = attackerIndex;
+			g_dotEffects[index].damagePerTick = flDamagePerTick;
+			g_dotEffects[index].damageType = bitsDamageType;
+			g_dotEffects[index].tickInterval = flInterval;
+			g_dotEffects[index].ticksLeft = iTotalTicks;
+			g_dotEffects[index].nextTickTime = gpGlobals->time + flInterval;
+			return;
+		}
+	}
+}
+
+static void ProcessDoTEffects(void)
+{
+	for (int index = 0; index < MAX_DOT_EFFECTS; index++)
+	{
+		dot_effect_t *pEffect = &g_dotEffects[index];
+
+		if (pEffect->victimIndex <= 0 || pEffect->ticksLeft <= 0)
+			continue;
+
+		if (gpGlobals->time < pEffect->nextTickTime)
+			continue;
+
+		edict_t *pVictim = INDEXENT(pEffect->victimIndex);
+		if (!pVictim || pVictim->free || !pVictim->v.takedamage)
+		{
+			pEffect->victimIndex = 0;
+			pEffect->damageType = 0;
+			continue;
+		}
+
+		if ((pVictim->v.flags & FL_CLIENT) && !UTIL_IsAlive(pVictim))
+		{
+			pEffect->victimIndex = 0;
+			pEffect->damageType = 0;
+			continue;
+		}
+
+		edict_t *pAttacker = INDEXENT(pEffect->attackerIndex);
+		entvars_t *pevAttacker = ((pAttacker != NULL) && !pAttacker->free) ? VARS(pAttacker) : VARS(pVictim);
+
+		if (UTIL_IsPlayer(pVictim))
+		{
+			UTIL_TakeDamage(pVictim, pevAttacker, pevAttacker, pEffect->damagePerTick, pEffect->damageType);
+		}
+		else if (pVictim->v.euser4 != NULL)
+		{
+			CMBaseMonster *pMonster = GetClassPtr((CMBaseMonster *)VARS(pVictim));
+			if (pMonster != NULL)
+				pMonster->TakeDamage(pevAttacker, pevAttacker, pEffect->damagePerTick, pEffect->damageType);
+		}
+		else
+		{
+			UTIL_TakeDamageExternal(pVictim, pevAttacker, pevAttacker, pEffect->damagePerTick, pEffect->damageType);
+		}
+
+		pEffect->ticksLeft--;
+		if (pEffect->ticksLeft <= 0)
+		{
+			pEffect->victimIndex = 0;
+			pEffect->damageType = 0;
+		}
+		else
+		{
+			pEffect->nextTickTime = gpGlobals->time + pEffect->tickInterval;
+		}
+	}
+}
+
 bool process_monster_cfg(void);
 bool process_monster_precache_cfg(void);
 
@@ -1375,6 +1511,7 @@ int mmDispatchSpawn( edict_t *pent )
 		}
 
 		monster_ents_used = 0;
+		ResetDoTEffects();
 
 		for (index = 0; index < ARRAYSIZE(gDecals); index++ )
 			gDecals[index].index = DECAL_INDEX( gDecals[index].name );
@@ -1602,12 +1739,14 @@ void mmServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 	}
 
 	monster_ents_used = 0;
+	ResetDoTEffects();
 	
 	RETURN_META(MRES_IGNORED);
 }
 
 void mmStartFrame( void )
 {
+	ProcessDoTEffects();
 	// Don't generate node graph right away
 	if (check_graph_time != -1 && check_graph_time <= gpGlobals->time)
 	{
