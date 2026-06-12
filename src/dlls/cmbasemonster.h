@@ -92,8 +92,8 @@ public:
 		int					m_iMaxHealth;// keeps track of monster's maximum health value (for re-healing, etc)
 
 	// ---- Elite variant system ----
-	int					m_iEliteAffix;		// ELITE_NONE (0) or ELITE_BULWARK/SWIFT/BRUTAL
-	float				m_flEliteDmgMult;	// damage multiplier for melee (1.0 = normal, 1.4 = brutal)
+	int					m_iEliteAffix = ELITE_NONE;	// ELITE_NONE (0) or ELITE_BULWARK/SWIFT/BRUTAL
+	float				m_flEliteDmgMult = 1.0f;		// damage multiplier for melee (1.0 = normal, 1.4 = brutal)
 
 	Vector				m_vecEnemyLKP;// last known position of enemy. (enemy's origin)
 

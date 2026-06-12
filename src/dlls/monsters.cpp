@@ -222,6 +222,14 @@ void CMBaseMonster :: EliteInit ( void )
 		pev->max_health = pev->health;
 		m_flEliteDmgMult = 1.40f;
 		break;
+	default:
+		// Corrupted value — reset to non-elite
+		pev->renderfx = kRenderFxNone;
+		pev->rendermode = kRenderNormal;
+		pev->renderamt = 0;
+		m_iEliteAffix = ELITE_NONE;
+		m_flEliteDmgMult = 1.0f;
+		break;
 	}
 }
 
