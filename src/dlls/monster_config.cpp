@@ -593,6 +593,13 @@ void scan_monster_cfg(FILE *fp)
 					break;
 				}
 				
+				// Check that we haven't exceeded the keyvalue limit
+				if ( kvd_index >= MAX_KEYVALUES )
+				{
+					LOG_MESSAGE( PLID, "WARNING: entity has >%d keyvalues, extras will be ignored.", MAX_KEYVALUES );
+					continue;
+				}
+
 				// Bruteforce to remove quotes
 				char parse[1024] = {0};
 				int skip = 0;
@@ -983,7 +990,7 @@ void scan_extra_cfg(FILE *fp)
 			continue; // command with no value, skip
 
 		// Remove all quotes from "value"
-		char parse[128] = {0};
+		char parse[1024] = {0};
 		int skip = 0;
 		for (unsigned i = 0; i < strlen(value); i++)
 		{
@@ -995,7 +1002,7 @@ void scan_extra_cfg(FILE *fp)
 			parse[i-skip] = value[i];
 		}
 		parse[strlen(parse)] = '\0';
-		strcpy(value, parse);
+		snprintf(value, 1024, "%s", parse);
 
 		if (strcmp(cmd, "globalmodellist") == 0)
 		{
