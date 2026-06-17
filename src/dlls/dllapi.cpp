@@ -421,8 +421,10 @@ int GetMonsterIndex(void)
 
 void FreeMonsterIndex(int index)
 {
-	delete monsters[index].pMonster;
-	
+	// Don't delete pMonster here — Remove_Entity/SUB_Remove is often called
+	// from within the monster's own Think(), and deleting the object while
+	// it's still mid-stack causes heap corruption / vtable murder.
+	// pMonster will be freed at the next mmDispatchSpawn → worldspawn handler.
 	monsters[index].monster_index = 0;
 	monsters[index].monster_pent = NULL;
 	monsters[index].killed = FALSE;
