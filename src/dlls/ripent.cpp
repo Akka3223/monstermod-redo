@@ -31,7 +31,7 @@ entity_t	entities[MAX_MAP_ENTITIES];
 
 dheader_t	*header;
 
-int CopyLump(int lump, void *dest, int size)
+int CopyLump(int lump, void *dest, int size, int maxDestSize = 0)
 {
 	int		length, ofs;
 
@@ -41,6 +41,12 @@ int CopyLump(int lump, void *dest, int size)
 	if (length % size)
 	{
 		LOG_MESSAGE(PLID, "LoadBSPFile: odd lump size");
+		return 0;
+	}
+
+	if (maxDestSize > 0 && length > maxDestSize)
+	{
+		LOG_MESSAGE(PLID, "LoadBSPFile: lump %d too large (%d > %d)", lump, length, maxDestSize);
 		return 0;
 	}
 
@@ -83,7 +89,7 @@ void	LoadBSPFile(char *filename)
 		return;
 	}
 	
-	entdatasize = CopyLump(LUMP_ENTITIES, dentdata, 1);
+	entdatasize = CopyLump(LUMP_ENTITIES, dentdata, 1, sizeof(dentdata));
 	
 	free(header);		// everything has been copied out
 }
@@ -105,6 +111,7 @@ epair_t *ParseEpair(void)
 	if (strlen(token) >= MAX_KEY - 1)
 	{
 		LOG_MESSAGE(PLID, "ParseEpar: token key too long");
+		free(e);
 		return NULL;
 	}
 	e->key = copystring(token);
@@ -112,6 +119,8 @@ epair_t *ParseEpair(void)
 	if (strlen(token) >= MAX_VALUE - 1)
 	{
 		LOG_MESSAGE(PLID, "ParseEpar: token value too long");
+		free(e->key); // free the key string
+		free(e);
 		return NULL;
 	}
 	e->value = copystring(token);
@@ -325,7 +334,11 @@ bool EndOfScript(bool crossline)
 		return false;
 	}
 
-	free(script->buffer);
+	if (script->buffer)
+	{
+		free(script->buffer);
+		script->buffer = NULL;
+	}
 	if (script == scriptstack + 1)
 	{
 		endofscript = true;
@@ -349,6 +362,11 @@ void AddScriptToStack(char *filename)
 	strcpy(script->filename, ExpandPath(filename));
 
 	size = LoadFile(script->filename, (void **)&script->buffer);
+	if (size == -1)
+	{
+		script->buffer = NULL; // prevent stale pointer in EndOfScript
+		return;
+	}
 
 	//printf("entering %s\n", script->filename);
 
@@ -425,6 +443,8 @@ skipspace:
 				// if the server does not crash before this happens, then monstermod will.
 				// simulate a fatal error and be verbose on why it happens.
 				ALERT(at_logged, "FATAL ERROR (shutting down): ReadEntsFromBSP: Line %i is too long (length > %i).", scriptline, MAXTOKEN);
+				*token_p = 0;
+				return false;
 			}
 		}
 		script->script_p++;
@@ -439,6 +459,8 @@ skipspace:
 			{
 				// ditto
 				ALERT(at_logged, "FATAL ERROR (shutting down): ReadEntsFromBSP: Line %i is too long (length > %i).", scriptline, MAXTOKEN);
+				*token_p = 0;
+				return false;
 			}
 		}
 
