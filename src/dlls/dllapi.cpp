@@ -505,18 +505,49 @@ void check_monster_hurt(edict_t *pAttacker)
 						float flDmg = pent->v.fuser4 - pent->v.health;
 						if (flDmg > 0 && monsters[index].pMonster != NULL)
 						{
+							// Build the same info panel as the mouseover HUD
 							char szName[129];
 							if ( !FStringNull( monsters[index].pMonster->m_szMonsterName ) )
 								strcpy( szName, STRING( monsters[index].pMonster->m_szMonsterName ) );
 							else
 								strcpy( szName, STRING( pent->v.classname ) );
 
+							// Display name with elite prefix
+							char szDisplayName[160];
+							if ( monsters[index].pMonster->IsElite() )
+								sprintf( szDisplayName, "Elite %s", szName );
+							else
+								strcpy( szDisplayName, szName );
+
+							// Health bar
+							float flMaxHealth = pent->v.max_health;
+							if ( flMaxHealth < 1.0f )
+								flMaxHealth = pent->v.fuser4;
+							float flCurHealth = pent->v.health < 0 ? 0 : pent->v.health;
+							int barSegments = 10;
+							int filled = (int)( ( flCurHealth / flMaxHealth ) * barSegments );
+							if ( filled < 0 ) filled = 0;
+							if ( filled > barSegments ) filled = barSegments;
+							char szBar[11];
+							for ( int i = 0; i < barSegments; i++ )
+								szBar[i] = ( i < filled ) ? '#' : '-';
+							szBar[barSegments] = 0;
+
+							// Classify as ally/enemy using same logic as mouseover
+							BOOL isAlly = FALSE;
+							int classify = monsters[index].pMonster->Classify();
+							if ( classify == CLASS_HUMAN_PASSIVE || classify == CLASS_PLAYER_ALLY )
+								isAlly = TRUE;
+
 							char szHitMsg[257];
-							const char *szPrefix = monsters[index].pMonster->IsElite() ? "Elite " : "";
-							sprintf( szHitMsg, "-%.0f  %s%s", flDmg, szPrefix, szName );
+							sprintf( szHitMsg, "%s  [%s]  %.0f/%.0f",
+								szDisplayName, szBar, flCurHealth, flMaxHealth );
 
 							union { float f; long l; } fl;
-							long color = 255 + (60 << 8) + (40 << 16) + (200 << 24); // orange-red RGBA
+							long color = (isAlly ? 9 : 171)
+									   + ((isAlly ? 172 : 23) << 8)
+									   + ((isAlly ? 96 : 7) << 16)
+									   + (200 << 24); // alpha 200
 
 							MESSAGE_BEGIN( MSG_ONE, SVC_DIRECTOR, NULL, pDamageSource );
 							WRITE_BYTE( strlen( szHitMsg ) + 31 );
@@ -524,10 +555,10 @@ void check_monster_hurt(edict_t *pAttacker)
 							WRITE_BYTE( 0 );
 							WRITE_LONG( color );
 							fl.f = -1.0f; WRITE_LONG( fl.l );     // x = center
-							fl.f = 0.45f; WRITE_LONG( fl.l );     // y = upper-center
+							fl.f = 0.80f; WRITE_LONG( fl.l );     // y = bottom (same as mouseover)
 							fl.f = 0.0f;  WRITE_LONG( fl.l );     // fadein
-							fl.f = 0.3f;  WRITE_LONG( fl.l );     // fadeout
-							fl.f = 1.5f;  WRITE_LONG( fl.l );     // hold
+							fl.f = 0.35f;  WRITE_LONG( fl.l );     // fadeout
+							fl.f = 0.35f;  WRITE_LONG( fl.l );     // hold
 							fl.f = 0.0f;  WRITE_LONG( fl.l );     // fx
 							WRITE_STRING( szHitMsg );
 							MESSAGE_END();
@@ -574,7 +605,10 @@ void check_monster_hurt(edict_t *pAttacker)
 						{
 							if (strncmp( STRING( pent->v.classname ), "monster_", 8 ) == 0 && pent->v.flags & FL_MONSTER)
 							{
-								monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, DMG_BULLET|DMG_GIB_CORPSE );
+								// Use NEVERGIB for already-dead monsters (corpse removal) so they
+								// disappear cleanly instead of exploding with CallGibMonster().
+								int dmgBits = UTIL_IsAlive(pent) ? (DMG_BULLET|DMG_GIB_CORPSE) : (DMG_BULLET|DMG_NEVERGIB);
+								monsters[index].pMonster->TraceAttack( VARS(pDamageSource), damage, (tr.vecEndPos - vecSrc).Normalize( ), &tr, dmgBits );
 							}
 							else
 							{
@@ -902,10 +936,10 @@ void check_monster_info( edict_t *pPlayer )
 					WRITE_BYTE( 0 );                      // effect: 0 = instant
 					WRITE_LONG( color );                  // RGBA color
 					fl.f = -1.0f; WRITE_LONG( fl.l );     // x = center
-					fl.f = 0.90f; WRITE_LONG( fl.l );     // y = near bottom
+					fl.f = 0.80f; WRITE_LONG( fl.l );     // y = near bottom
 					fl.f = 0.0f;  WRITE_LONG( fl.l );     // fade-in time (seconds)
-					fl.f = 1.7f;  WRITE_LONG( fl.l );     // fade-out time (seconds)
-					fl.f = 44.8f; WRITE_LONG( fl.l );     // hold time (seconds)
+					fl.f = 0.35f;  WRITE_LONG( fl.l );     // fade-out time (seconds)
+					fl.f = 0.4f;  WRITE_LONG( fl.l );     // hold time (seconds)
 					fl.f = 0.0f;  WRITE_LONG( fl.l );     // fx time (seconds)
 					WRITE_STRING( szInfo );               // message text
 					MESSAGE_END();
